@@ -1,0 +1,226 @@
+{% extends 'construction/base.html' %}
+{% block content %}
+<div class="card" style="width: 100%;">
+<div class="card-header">
+<h4>Cash Payment Voucher</h4>
+</div>
+<ul class="list-group list-group-flush">
+<form  action="" id="new-cpv-form" autocomplete="off"  method="post">
+{% csrf_token %}
+<li class="list-group-item">
+    <div class="form-row">
+      <div class="form-group col-md-2">
+        <label for="">Transaction ID</label>
+        <input type="text" readonly class="form-control form-control-sm" required value="{{ get_last_tran_id }}" id="cpv-tran_id">
+      </div>
+      <div class="form-group col-md-2">
+        <label for="">Document No</label>
+        <input type="text" class="form-control form-control-sm" required id="cpv-doc_no">
+      </div>
+      <div class="form-group col-md-2">
+        <label for="">Date</label>
+        <input type="date"  class="form-control form-control-sm" required value="" id="cpv-date">
+      </div>
+      <div class="form-group col-md-2">
+        <label for="">Document Date</label>
+        <input type="date"  class="form-control form-control-sm" required value="" id="cpv-doc_date">
+      </div>
+      <div class="form-group col-md-2">
+        <label for="">Description</label>
+        <textarea name="name" class="form-control form-control-sm" style="width:370px; height:30px;" id="cpv-description"></textarea>
+      </div>
+    </div>
+    <div class="table-title">
+        <div class="row">
+          <div class="col-md-2">
+            <label for="">Customers</label>
+            <select class="form-control form-control-sm" id="cpv-account_title">
+              <option value="">Select: </option>
+              {% for cof in cof %}
+              <option value="{{cof.id}}">{{cof.account_title}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label for="">Project</label>
+            <select class="form-control form-control-sm" id="cpv-project_id">
+
+            </select>
+          </div>
+            <div class="form-group col-md-2">
+              <label for="">Amount</label>
+              <input type="text" id="amount" class="form-control form-control-sm"/>
+            </div>
+            <div class="form-group col-md-2">
+              <button type="button" style="margin-top:30px;" class="btn btn-info btn-sm load-invoices" id='insert-cpv-account-to-table' disabled><i class="fa fa-plus"></i> Load</button>
+            </div>
+        </div>
+    </div>
+    </li>
+  <li class="list-group-item">
+  <div class="table table-responsive">
+    <table class="table table-bordered" id="new-cpv-table">
+      <thead>
+          <tr>
+              <th width="150px">Account Id</th>
+              <th width="250px">Account Title</th>
+              <th width="250px">Debit</th>
+              <th width="250px">Credit</th>
+          </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+  </li>
+    <br>
+  <div class="text-center">
+    <button type="submit" class="btn btn-outline-primary">Submit <small>(CR Voucher)</small></button>
+  </div>
+  <br>
+</form>
+</ul>
+</div>
+
+<script type="text/javascript">
+
+  $("#insert-cpv-account-to-table").on('click',function(){
+    $("#new-cpv-table tbody").append("<tr><td>"+ $("#cpv-account_title option:selected").val() +"</td><td>"+ $("#cpv-account_title option:selected").text() +"</td><td>"+ $("#amount").val() +"</td><td>0.00</td></tr>")
+  });
+
+  $('#new-cpv-table').on('click','#add-CPV',function(){
+    var tr = $(this).closest('tr');
+    var debitTd = tr.find('td:eq(3)');
+    var creditTd = tr.find('td:eq(4)');
+    var plus_button = tr.find('td:eq(5)');
+    plus = plus_button.find('#add-CPV');
+    plus.attr('hidden','true');
+    pencil_button = plus_button.find('#edit-CPV');
+    console.log(pencil_button)
+    pencil_button.removeAttr('hidden');
+    debitInput = debitTd.find('input');
+    debitInput.attr('disabled','disabled');
+    creditInput = creditTd.find('input');
+    creditInput.attr('disabled','disabled');
+  });
+
+  $("#new-cpv-table").on('click','#edit-CPV',function(){
+    var tr = $(this).closest('tr');
+    var debitTd = tr.find('td:eq(3)');
+    var creditTd = tr.find('td:eq(4)');
+    debitInput = debitTd.find('input');
+    debitInput.removeAttr('disabled');
+    creditInput = creditTd.find('input');
+    creditInput.removeAttr('disabled');
+    var plus_button = tr.find('td:eq(5)');
+    plus = plus_button.find("#add-CPV");
+    plus.removeAttr('hidden');
+    plus_button = plus_button.find('#edit-CPV');
+    plus_button.attr('hidden','hidden')
+    console.log(plus_button);
+  });
+
+  function getCookie(c_name)
+{
+if (document.cookie.length > 0)
+{
+    c_start = document.cookie.indexOf(c_name + "=");
+    if (c_start != -1)
+    {
+        c_start = c_start + c_name.length + 1;
+        c_end = document.cookie.indexOf(";", c_start);
+        if (c_end == -1) c_end = document.cookie.length;
+        return unescape(document.cookie.substring(c_start,c_end));
+    }
+}
+return "";
+}
+
+  $("#cpv-account_title").on('change', function(){
+    main_object_id = this.value;
+    req =	$.ajax({
+     headers: { "X-CSRFToken": getCookie("csrftoken") },
+     type: 'POST',
+     url : '/transaction/cash_payment_voucher/new',
+     data:{
+       'main_object_id':main_object_id ,
+       'samp':"projectUpdate",
+     },
+     dataType: 'json'
+    })
+    .done(function done(data) {
+      sub_menu = JSON.parse(data.sub_menu)
+      $('#cpv-project_id').empty()
+      $('#cpv-project_id').append($("<option></option>").attr("value",3).text("General: "));
+      console.log(sub_menu);
+      for (var i = 0; i < sub_menu.length; i++) {
+          $('#cpv-project_id').append($("<option></option>").attr("value",sub_menu[i].pk).text(sub_menu[i].fields["projectName"]));
+      }
+
+    })
+  });
+
+  $("#new-cpv-form").on('submit', function(e){
+    e.preventDefault();
+      var table = $('#new-cpv-table');
+      var data = [];
+
+      table.find('tr').each(function (i, el){
+          if(i != 0)
+          {
+              var $tds = $(this).find('td');
+              var row = {
+                  'AccountId' : "",
+                  'Debit':"",
+                  'Credit':"",
+              };
+              $tds.each(function(i, el){
+                  if(i == 0){
+                      row['AccountId'] = ($(this).text());
+                  }
+                  else if (i == 2){
+                      row['Debit'] = ($(this).text());
+                  }
+                  else if (i == 3){
+                      row["Credit"] = ($(this).text());
+                  }
+              });
+              data.push(row);
+          }
+      });
+
+      req =   $.ajax({
+                  headers: { "X-CSRFToken": getCookie("csrftoken") },
+                  type: 'POST',
+                  url : '/transaction/cash_payment_voucher/new',
+                  data:{
+                      'items': JSON.stringify(data),
+                      'doc-date': $("#cpv-doc_date").val(),
+                      'date': $("#cpv-date").val(),
+                      'documentNo': $("#cpv-doc_no").val(),
+                      'transactionId': $("#cpv-tran_id").val(),
+                      'description': $("#cpv-description").val(),
+                      'project': $("#cpv-project_id option:selected").val(),
+                      'account_id':$("#cpv-account_title option:selected").val(),
+                  },
+                  dataType: 'json'
+              })
+      .done(function done(data){
+        alert("successfully submitted")
+          location.reload();
+      })
+  })
+
+  $("#amount").blur(function(){
+  var inp = $("#amount");
+  if (inp.val().length > 0) {
+  $("#insert-cpv-account-to-table").removeAttr('disabled');
+  }
+  else if(inp.val().length == 0) {
+  $("#insert-cpv-account-to-table").attr('disabled','disabled');
+  }
+  });
+
+</script>
+
+{% endblock %}

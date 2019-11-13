@@ -1,0 +1,78 @@
+{% extends 'construction/base.html' %}
+{% block content %}
+  <div class="card" style="width: 100%;">
+  <div class="card-header">
+  <h4>Purchases</h4>
+  </div>
+  <ul class="list-group list-group-flush">
+  <li class="list-group-item">
+    <ul style="list-style-type:none;" class="messages">
+      {% if messages %}
+        {% for msg in messages %}
+          <li>
+            <div class="alert {{msg.level_tag}}">
+              {{msg.message}}
+            </div>
+          </li>
+        {% endfor %}
+      {% endif %}
+    </ul>
+    <div class="input-group">
+      <div class="col-md-12">
+          <a role="button" href="{% url 'Purchase-New' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
+      </div>
+    </div>
+    <br>
+    <div class="table table-responsive content-loader">
+      <table class="table table-bordered sort" id="dataTable">
+          <thead>
+              <tr>
+                  <th width="140px">Purchase ID</th>
+                  <th >Date</th>
+                  <th >Supplier</th>
+                  <th >From</th>
+                  <th width="400px">Action</th>
+              </tr>
+          </thead>
+          <tbody>
+            {% for value in all_purchases reversed %}
+            <tr>
+                <td>{{ value.purchase_no }}</td>
+                <td>{{ value.date }}</td>
+                <td>{{ value.account_id.account_title }}</td>
+                <td>{{value.user_id.username}}</td>
+                <td>
+                      <a class="edit_list" href="{% url 'edit-purchase' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
+                      <a class="edit_list" href="{% url 'edit-purchase-ngst' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
+                  <a href="#" data-toggle=""><i class="fas fa-undo"></i></a>
+                  <a class="delete_purchase"  href="" data-toggle="modal" data-target="#deletePurchaseModal" id="{{value.id}}"><i class="material-icons">&#xE872;</i></a>
+                </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+      </table>
+    </div>
+  </li>
+  </ul>
+  </div>
+
+  <!-- Delete Modal-->
+  <div class="modal fade" id="deletePurchaseModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Delete Purchase Invoice</h5>
+        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">Are you sure you want to delete?</div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <a class="btn btn-danger" href="" id="modal_delete_button">Delete</a>
+      </div>
+    </div>
+  </div>
+  </div>
+  <!-- Modal -->
+{% endblock %}

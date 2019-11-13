@@ -1,0 +1,240 @@
+{% extends 'construction/base.html' %}
+{% block content %}
+      <div class="card" style="width: 100%;">
+    <div class="card-header">
+      <h4>Bank Receiving Voucher</h4>
+    </div>
+    <ul class="list-group list-group-flush">
+    <form  action="" id="new-brv-form-brv" autocomplete="off"  method="post">
+      {% csrf_token %}
+      <li class="list-group-item">
+          <div class="form-row">
+            <div class="form-group col-md-2">
+              <label for="">Transaction ID</label>
+              <input type="text" readonly class="form-control form-control-sm" required value="{{ get_last_tran_id }}" id="tran_id">
+            </div>
+            <div class="form-group col-md-2">
+              <label for="">Date</label>
+              <input type="date"  class="form-control form-control-sm" required value="" id="date">
+            </div>
+            <div class="form-group col-md-2">
+              <label for="">Doc Date</label>
+              <input type="date"  class="form-control form-control-sm" required value="" id="doc_date">
+            </div>
+            <div class="form-group col-md-2">
+              <label for="">Cheque No</label>
+              <input type="text"  class="form-control form-control-sm" required value="" id="cheque_no">
+            </div>
+            <div class="form-group col-md-2">
+              <label for="">Cheque Date</label>
+              <input type="date"  class="form-control form-control-sm" required value="" id="cheque_date">
+            </div>
+            <div class="form-group col-md-2">
+              <label for="">Description</label>
+              <textarea name="name" class="form-control" style="width:200px; height:30px;" id="description"></textarea>
+            </div>
+          </div>
+          <div class="table-title">
+              <div class="row">
+                <div class="col-md-2">
+                  <label for="">Customers</label>
+                  <select class="form-control form-control-sm" id="brv-account_title">
+                    <option value="">SELECT: </option>
+                    {% for c in cof %}
+                    <option value="{{c.id}}">{{c.account_title}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <label for="">Projects</label>
+                  <select class="form-control form-control-sm" id="brv-project_id">
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <label for="">Bank Account</label>
+                  <select class="form-control form-control-sm" id="brv_bank_account">
+                    <option value="">SELECT: </option>
+                    {% for bank in all_bank_accounts %}
+                    <option value="{{bank.id}}">{{bank.account_title}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                  <div class="form-group col-md-2">
+                    <label for="">Amount</label>
+                    <input type="text" id="amount" class="form-control form-control-sm"/>
+                  </div>
+                  <div class="form-group col-md-2">
+                    <button type="button" style="margin-top:30px;" class="btn btn-info btn-sm load-invoices-brv" id="insert-brv-account-to-table" disabled><i class="fa fa-plus"></i>Load</button>
+                  </div>
+              </div>
+          </div>
+          </li>
+        <li class="list-group-item">
+        <div class="table table-responsive">
+          <table class="table table-bordered" id="new-brv-table">
+              <thead>
+                  <tr>
+                      <th width="100px">Account Id</th>
+                      <th width="300px">Account Title</th>
+                      <th width="100px">Debit</th>
+                      <th width="100px">Credit</th>
+                  </tr>
+              </thead>
+              <tbody>
+              </tbody>
+          </table>
+        </div>
+        </li>
+          <br>
+        <div class="text-center">
+          <button type="submit" class="btn btn-outline-primary">Submit <small>(BR Voucher)</small></button>
+        </div>
+        <br>
+    </form>
+    </ul>
+    </div>
+
+    <script type="text/javascript">
+
+      function getCookie(c_name)
+    {
+    if (document.cookie.length > 0)
+    {
+        c_start = document.cookie.indexOf(c_name + "=");
+        if (c_start != -1)
+        {
+            c_start = c_start + c_name.length + 1;
+            c_end = document.cookie.indexOf(";", c_start);
+            if (c_end == -1) c_end = document.cookie.length;
+            return unescape(document.cookie.substring(c_start,c_end));
+        }
+    }
+    return "";
+    }
+
+
+
+    $(".load-invoices-brv").on('click',function(){
+      $("#new-brv-table tbody").append("<tr><td>"+ $("#brv-account_title option:selected").val() +"</td><td>"+ $("#brv-account_title option:selected").text() +"</td><td>0.00</td><td>"+$('#amount').val()+"</td></tr>")
+    });
+
+    $('#new-brv-table').on('click','#add-BRV',function(){
+      var tr = $(this).closest('tr');
+      var debitTd = tr.find('td:eq(3)');
+      var creditTd = tr.find('td:eq(4)');
+      var plus_button = tr.find('td:eq(5)');
+      plus = plus_button.find('#add-BRV');
+      plus.attr('hidden','true');
+      pencil_button = plus_button.find('#edit-BRV');
+      console.log(pencil_button)
+      pencil_button.removeAttr('hidden');
+      debitInput = debitTd.find('input');
+      debitInput.attr('disabled','disabled');
+      creditInput = creditTd.find('input');
+      creditInput.attr('disabled','disabled');
+    });
+
+    $("#new-brv-table").on('click','#edit-BRV',function(){
+      var tr = $(this).closest('tr');
+      var debitTd = tr.find('td:eq(3)');
+      var creditTd = tr.find('td:eq(4)');
+      debitInput = debitTd.find('input');
+      debitInput.removeAttr('disabled');
+      creditInput = creditTd.find('input');
+      creditInput.removeAttr('disabled');
+      var plus_button = tr.find('td:eq(5)');
+      plus = plus_button.find("#add-BRV");
+      plus.removeAttr('hidden');
+      plus_button = plus_button.find('#edit-BRV');
+      plus_button.attr('hidden','hidden')
+      console.log(plus_button);
+    });
+
+      $("#brv-account_title").on('change', function(){
+        main_object_id = this.value;
+        req =	$.ajax({
+         headers: { "X-CSRFToken": getCookie("csrftoken") },
+         type: 'POST',
+         url : '/transaction/bank_receiving_voucher/new',
+         data:{
+           'main_object_id':main_object_id ,
+           'samp':"projectUpdate",
+         },
+         dataType: 'json'
+        })
+        .done(function done(data) {
+          sub_menu = JSON.parse(data.sub_menu)
+          $('#brv-project_id').empty()
+          $('#brv-project_id').append($("<option></option>").attr("value",0).text("Select: "));
+          console.log(sub_menu);
+          for (var i = 0; i < sub_menu.length; i++) {
+              $('#brv-project_id').append($("<option></option>").attr("value",sub_menu[i].pk).text(sub_menu[i].fields["projectName"]));
+          }
+        })
+      });
+
+      $("#new-brv-form-brv").on('submit', function(e){
+        e.preventDefault();
+          var table = $('#new-brv-table');
+          var data = [];
+
+          table.find('tr').each(function (i, el){
+              if(i != 0)
+              {
+                  var $tds = $(this).find('td');
+                  var row = {
+                      'AccountId' : "",
+                      'Debit':"",
+                      'Credit':"",
+                  };
+                  $tds.each(function(i, el){
+                      if(i == 0){
+                        console.log($(this).text());
+                          row['AccountId'] = ($(this).text());
+                      }
+                      else if (i == 2){
+                          row['Debit'] = ($(this).text());
+                      }
+                      else if (i == 3){
+                          row["Credit"] = ($(this).text());
+                      }
+                  });
+                  data.push(row);
+              }
+          });
+
+          req =   $.ajax({
+                      headers: { "X-CSRFToken": getCookie("csrftoken") },
+                      type: 'POST',
+                      url : '/transaction/bank_receiving_voucher/new',
+                      data:{
+                          'items': JSON.stringify(data),
+                          'doc-date': $("#doc_date").val(),
+                          'date': $("#date").val(),
+                          'transactionId': $("#tran_id").val(),
+                          'cheque_no': $("#cheque_no").val(),
+                          'cheque_date': $("#cheque_date").val(),
+                          'description': $("#description").val(),
+                          'project': $("#brv-account_title option:selected").val(),
+                          'account_id':$("#brv-project_id option:selected").val(),
+                          'bank_account':$("#brv_bank_account option:selected").val(),
+                      },
+                      dataType: 'json'
+                  })
+          .done(function done(data){
+            alert("successfully submitted");
+              location.reload();
+          })
+      })
+
+      $("#amount").blur(function(){
+      var inp = $("#amount");
+      if (inp.val().length > 0) {
+      $("#insert-brv-account-to-table").removeAttr('disabled');
+  }
+    else if(inp.val().length == 0) {
+      $("#insert-brv-account-to-table").attr('disabled','disabled');
+    }
+  });
+    </script>
+{% endblock %}

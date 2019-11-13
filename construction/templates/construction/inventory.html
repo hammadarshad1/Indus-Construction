@@ -1,0 +1,254 @@
+{% extends 'construction/base.html' %}
+{% load static %}
+{% block content %}
+  <link href="{% static 'construction/css/style.css' %}" rel="stylesheer" type="text/css">
+    <div class="input-group">
+        <div class="col-md-12">
+          <div class="col-md-12">
+            <a role="button" href="{% url 'Add-Category' %}" style="float:right;" class="btn btn-outline-secondary" ><i class="fas fa-plus"></i> Add New Category</a>
+          </div>
+          <div class="col-md-10">
+            <a role="button" href="" style="float:right;" class="btn btn-outline-secondary" name="button" data-toggle="modal" data-target="#addCategoryModal"><i class="fas fa-plus"></i> Add New</a>
+          </div>
+        </div>
+    </div>
+      <h4>Inventory</h4>
+    <div class="table table-responsive">
+        <table class="table table-bordered sort" id='dataTable'>
+                <tr>
+                    <th width="100px">S NO.</th>
+                    <th style='display: none;'>inv id</th>
+                    <th>Item Name</th>
+                    <th>Item Category</th>
+                    <th>Item Quantity</th>
+                    <th>Project</th>
+                    <th>Unit Price</th>
+                    <th>Unit</th>
+                    <th width="200px">Action</th>
+                </tr>
+                {% for inventory in inventories %}
+                  <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td style="display: none;">{{ inventory.itemId }}</td>
+                    <td>{{ inventory.itemName }}</td>
+                    <td>{{ inventory.itemCategory }}</td>
+                    <td>{{ inventory.itemQuantity }}</td>
+                    <td>{{ inventory.projectId }}</td>
+                    <td>{{ inventory.unitPrice }}</td>
+                    <td>{{ inventory.unit }}</td>
+                    <td><a data-toggle="modal" data-target="#updateInventoryModal" id='editInventoryButton'><button class="btn"><i class="fas fa-pencil-alt" style="color: #ffcc00"></i></button></a><a data-toggle="modal" data-target="#deleteInventoryModal" class='delete-inventory' id='{{ inventory.itemId }}'><button class="btn" id='inventoryDeleteButton'><i class="fa fa-trash" style="color:#ff1a1a;"></i></button></a></td>
+                  </tr>
+                {% endfor %}
+        </table>
+    </div>
+
+    <div class="modal fade" id="addCategoryModal">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                  <h4 class="modal-title">Add Inventory</h4>
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <form action="{% url 'Inventory' %}" method="POST"  autocomplete="off" id='add-inventory-form'>
+                    {% csrf_token %}
+                     <div class="modal-body">
+                         <div class="form-row">
+                           <div class="form-group col-md-12">
+                             <input type="hidden"  class="form-control form-control-sm" value='add-inventory' name='inventory-edit-or-delete'>
+                          <label for="">Project</label>
+                          <select class="form-control form-control-sm main_drop" id="Project" name="Project">
+                            <option value="">Select:</option>
+                            {% for project in projects %}
+                            <option value="{{ project.projectId }}">{{ project.projectName }}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                           <div class="form-group col-md-12">
+                             <label for="">Item Name</label>
+                             <input type="text"  class="form-control form-control-sm" id="ItemName" name="ItemName">
+                           </div>
+                         <div class="form-group col-md-12">
+                          <label for="">Item Category</label>
+                          <select class="form-control form-control-sm main_drop" id="ItemCategory" name="ItemCategory">
+                            <option value="">Select:</option>
+                            {% for cat in category %}
+                            <option value="{{ cat.categoryId }}">{{ cat }}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                           <div class="form-group col-md-12">
+                             <label for="">Item Quantity</label>
+                             <input type="text"  class="form-control form-control-sm" id="ItemQuantity" name="ItemQuantity">
+                           </div>
+                           <div class="form-group col-md-12">
+                             <label for="">Unit</label>
+                             <input type="text"  class="form-control form-control-sm" id="Unit" name="Unit">
+                           </div>
+                           <div class="form-group col-md-12">
+                             <label for="">Unit Price</label>
+                             <input type="text"  class="form-control form-control-sm" id="UnitPrice" name="UnitPrice">
+                           </div>
+
+                          </div>
+                     </div>
+                   <!-- Modal footer -->
+                   <div class="modal-footer">
+                     <input type="submit" class="btn btn-success" value="Submit" id='submit-inventory-modal'>
+                   </div>
+                 </form>
+
+              <!-- <form class="" action="index.html" method="post">
+              </form> -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Delete Modal-->
+                  <div class="modal fade" id="deleteInventoryModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">Delete Inventory</h5>
+                          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">Are you sure you want to delete?</div>
+                        <div class="modal-footer">
+                          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                          <a class="btn btn-danger" href="" id="modal_delete_button">Delete</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                    <!-- Modal -->
+
+
+                    <div class="modal fade" id="updateInventoryModal">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+
+                                <!-- Modal Header -->
+                                <div class="modal-header">
+                                  <h4 class="modal-title">Update Inventory</h4>
+                                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                </div>
+
+                                <!-- Modal body -->
+                                <form action="{% url 'Inventory' %}" method="POST"  autocomplete="off" id='add-inventory-form'>
+                                    {% csrf_token %}
+                                     <div class="modal-body">
+                                         <div class="form-row">
+                                           <div class="form-group col-md-12">
+                                             <input type="hidden"  class="form-control form-control-sm" value='edit-inventory' name='inventory-edit-or-delete'>
+                                             <input type='text' style='' class="form-control form-control-sm" name='inventoryIdUpdate' id='inventoryIdUpdate'>
+                                          <label for="">Project</label>
+                                          <select class="form-control form-control-sm main_drop" id="ProjectUpdate" name="ProjectUpdate">
+                                            <option value="">Select:</option>
+                                            {% for project in projects %}
+                                            <option value="{{ project.projectId }}">{{ project.projectName }}</option>
+                                            {% endfor %}
+                                          </select>
+                                        </div>
+                                           <div class="form-group col-md-12">
+                                             <label for="">Item Name</label>
+                                             <input type="text"  class="form-control form-control-sm" id="ItemNameUpdate" name="ItemNameUpdate">
+                                           </div>
+                                         <div class="form-group col-md-12">
+                                          <label for="">Item Category</label>
+                                          <select class="form-control form-control-sm main_drop" id="ItemCategoryUpdate" name="ItemCategoryUpdate">
+                                            <option value="">Select:</option>
+                                            {% for cat in category %}
+                                            <option value="{{ cat.categoryId }}">{{ cat }}</option>
+                                            {% endfor %}
+                                          </select>
+                                        </div>
+                                           <div class="form-group col-md-12">
+                                             <label for="">Item Quantity</label>
+                                             <input type="text"  class="form-control form-control-sm" id="ItemQuantityUpdate" name="ItemQuantityUpdate">
+                                           </div>
+                                           <div class="form-group col-md-12">
+                                             <label for="">Unit</label>
+                                             <input type="text"  class="form-control form-control-sm" id="UnitUpdate" name="UnitUpdate">
+                                           </div>
+                                           <div class="form-group col-md-12">
+                                             <label for="">Unit Price</label>
+                                             <input type="text"  class="form-control form-control-sm" id="UnitPriceUpdate" name="UnitPriceUpdate">
+                                           </div>
+
+                                          </div>
+                                     </div>
+                                   <!-- Modal footer -->
+                                   <div class="modal-footer">
+                                     <input type="submit" class="btn btn-success" value="Submit" id='submit-inventory-modal'>
+                                   </div>
+                                 </form>
+
+                              <!-- <form class="" action="index.html" method="post">
+                              </form> -->
+                          </div>
+                        </div>
+                    </div>
+
+          <script>
+            $(".delete-inventory").on('click',function(){
+             $("#modal_delete_button").attr("href", `/inventory/delete/${this.id}`);
+            })
+
+            $("#dataTable tbody").on('click','#editInventoryButton', function(){
+                var tr = $(this).closest('tr');
+                var itemName = tr.find('td:eq(2)').text();
+                var itemCategory = tr.find('td:eq(3)').text();
+                var itemQuantity = tr.find('td:eq(4)').text();
+                var project = tr.find('td:eq(5)').text();
+                var unitPrice = tr.find('td:eq(6)').text();
+                var unit = tr.find('td:eq(7)').text();
+                var itemId = tr.find('td:eq(1)').text();
+
+                $("#ItemNameUpdate").val(itemName);
+                $("#ItemQuantityUpdate").val(itemQuantity);
+                $("#ProjectUpdate").val(project);
+                $("#UnitPriceUpdate").val(unitPrice);
+                $("#UnitUpdate").val(unit);
+                $("#inventoryIdUpdate").val(itemId);
+
+                console.log(itemName, itemId)
+
+                // $("#projectNameUpdate").val(projectName)
+                // $("#descriptionUpdate").val(description);
+                // $("#projectIdUpdate").val(projectID);
+            })
+            // $("#itemQuantity, #Unit, #UnitPrice", "#ItemQuantityUpdate, #UnitUpdate, #UnitPriceUpdatel").on('blur', function(e){
+            //   var isValid = true;
+            // $("#itemQuantity, #Unit, #UnitPrice", "#ItemQuantityUpdate, #UnitUpdate, #UnitPriceUpdate").each(function () {
+            //     if (parseIn($(this).val()) == NaN) {
+            //         isValid = false;
+            //         $(this).css({
+            //             "border": "1px solid red",
+            //             "background": "#FFCECE"
+            //         });
+            //     }
+            //     else {
+            //         $(this).css({
+            //             "border": "",
+            //             "background": ""
+            //         });
+            //     }
+            // });
+            // if (isValid == false)
+            //     e.preventDefault();
+            // })
+            // $("#UnitPrice").blur(function(){
+            //   if (parseInt($(this).val()) == NaN){
+            //     $(this).css({
+            //       "border": "1px solid red",
+            //       "background": "#FFCECE"
+            //     });
+            //   }
+            // })
+          </script>
+{% endblock %}

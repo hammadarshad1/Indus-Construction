@@ -1,0 +1,358 @@
+{% extends 'construction/base.html' %}
+{% block content %}
+    <div class="card" style="width: 100%;">
+    <div class="card-header">
+    <h4>Purchase Invoice</h4>
+    </div>
+    <ul class="list-group list-group-flush">
+    <form  action="" id="new-purchase-submit" autocomplete="off" method="post">
+    {% csrf_token %}
+    <li class="list-group-item">
+        <div class="form-row">
+          <div class="form-group col-md-2">
+            <label for="">Purchase ID</label>
+            <input type="text" readonly class="form-control form-control-sm" required value="{{ get_last_purchase_no }}" id="pur-purchase_id">
+          </div>
+          <div class="form-group col-md-2">
+            <label>Supplier Name</label>
+            <input list="account" id="supplier_name_purchase" class="form-control form-control-sm" required >
+            <datalist id="pur-account">
+              {% for value in all_accounts %}
+              <option value="{{value.account_title}}">{{value.account_title}}</option>
+              {% endfor %}
+          </datalist>
+          </div>
+          <div class="form-group col-md-2">
+           <label for="sel1">Payment Term:</label>
+           <select class="form-control form-control-sm" id="pur-payment_method">
+             <option>Select:</option>
+             <option>Cash</option>
+             <option>Credit</option>
+           </select>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="">No Of Days:</label>
+            <input type="text" readonly class="form-control form-control-sm" value="" id="pur-credit_days">
+          </div>
+          <div class="form-group">
+            <label for="exampleFormControlTextarea2">Description</label>
+            <textarea class="form-control rounded-0" rows="1" style="height: 34px" id="pur-footer_desc"></textarea>
+          </div>
+          <div class="col-md-2">
+            <label for="">Client</label>
+            <select class="form-control form-control-sm" id="pur-account_title">
+              <option value="">Select Account:</option>
+              {% for value in cof %}
+              <option value="{{value.id}}">{{value.account_title}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="">Project</label>
+            <select class="form-control form-control-sm" id="pur-project_id">
+              <!-- <option value="">Select Project:</option> -->
+              <!-- {% for value in projects %}
+              <option value="{{value.projectId}}">{{value.projectName}}</option>
+              {% endfor %} -->
+            </select>
+          </div>
+        </div>
+      </li>
+      <li class="list-group-item">
+      <div class="table-title">
+          <div class="row">
+            <div class="form-group col-md-3">
+              <input type="text" list="item" placeholder="Enter Item Name here..." class="form-control form-control-sm" id="item_code_purchase">
+            </div>
+            <datalist id="item">
+              {% for value in inventory %}
+              <option value="{{value.itemId}}">{{ value.itemName }}</option>
+              {% endfor %}
+            </datalist>
+              <div style="margin-left:20px;">
+                <!-- <input type="button" id='insert-purchase' class="btn btn-info add-item-purchase" value="+"> -->
+                <button type="button" name="button" class="btn btn-info add-item-purchase" id='insert-purchase'><i class="fa fa-plus"></i></button>
+                  <!-- <button type="button" ><i class="fa fa-plus" id='insert-purchase'></i>Insert Item</button> -->
+              </div>
+          </div>
+      </div>
+      <div class="table table-responsive">
+        <table class="table table-bordered" id="new-purchase-table">
+            <thead>
+                <tr>
+                    <th width="100px">Item Code</th>
+                    <th width="300px">Item Name</th>
+                    <th width="200px">Desc.</th>
+                    <th width="50px">Qty</th>
+                    <th width="50px">Unit</th>
+                    <th width="100px">Price</th>
+                    <th width="70px">VOG</th>
+                    <th width="90px">ST in % </th>
+                    <th width="90px">ST Amount</th>
+                    <th width="90px">Total</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+      </div>
+      </li>
+      <li class="list-group-item">
+        <input type="hidden" name="" value="" id="hidden">
+        <div class="float-right">
+          <div class="form-inline">
+            <div class="form-group">
+              <label for="text" style="font-size:14px;" >Cartage Amount:</label>
+                <input type="text" class="form-control form-control-sm" id="cartage_amount_purchase" style="border-top: 0px; border-right:0px; border-left:0px;" required value="0.00">
+            </div>
+          </div>
+          <div class="form-inline">
+            <div class="form-group">
+              <label for="text" style="font-size:14px;">Additional Tax: &nbsp;&nbsp;&nbsp;</label>
+              <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="additional_tax_purchase" required value="0.00">
+            </div>
+          </div>
+          <div class="form-inline">
+            <div class="form-group">
+              <!-- <label for="text" style="font-size:14px;">Withholding Tax:&nbsp;</label> -->
+              <input type="hidden" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="withholding_tax" required value="0">
+            </div>
+          </div>
+          <div class="form-inline">
+            <div class="form-group">
+              <label for="text" style="font-size:14px;"><b>Grand Total:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+              <input type="text" readonly class="form-control form-control-sm" id="last_grand_total" style="border-top: 0px; border-right:0px; border-left:0px;">
+            </div>
+          </div>
+        </div>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        </li>
+        <br>
+      <div class="text-center">
+        <button type="submit" class="btn btn-outline-primary">Submit <small>(Purchase)</small></button>
+      </div>
+      <br>
+    </form>
+    </ul>
+    </div>
+
+  <script>
+
+    function getCookie(c_name)
+  {
+  if (document.cookie.length > 0)
+  {
+      c_start = document.cookie.indexOf(c_name + "=");
+      if (c_start != -1)
+      {
+          c_start = c_start + c_name.length + 1;
+          c_end = document.cookie.indexOf(";", c_start);
+          if (c_end == -1) c_end = document.cookie.length;
+          return unescape(document.cookie.substring(c_start,c_end));
+      }
+  }
+  return "";
+  }
+
+    $("#insert-purchase").on('click',function(){
+      console.log($("#item_code_purchase").val());
+      main_object_id = $("#item_code_purchase").val();
+      req = $.ajax({
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        type: 'POST',
+        url : '/transaction/purchase/new',
+        data:{
+          'main_object_id':main_object_id ,
+          'samp':"purchaseTable",
+        },
+        dataType: 'json'
+      })
+      .done(function done(data){
+        sub_menu = JSON.parse(data.sub_menu)
+        $("new-purchase-table").empty();
+        $("#new-purchase-table").append("<tr><td>"+ $("#item_code_purchase").val() +"</td><td>"+ sub_menu[0]['fields']['itemName'] +"</td><td>"+ $("#pur-footer_desc").val() +"</td><td><input style='width: 50px;' type='text' id='pur-unit'></td><td>FT</td><td><input style='width: 100px;' type='text' id='pur-price'></td><td><input type='text' style='width: 70px;' readonly></td><td><input style='width: 50px;' type='text' id='pur-st'></td><td><input type='text' style='width: 70px;' readonly></td><td><input type='text' style='width: 70px;' readonly></td><td><a id='edit-PUR' hidden='hidden'><button class='btn' type='button'><i class='fas fa-pencil-alt' style='color:#e6e600;'></i></button></a><a id='add-PUR'><button class='btn' type='button'><i class='fas fa-plus' style='color:#00b300;'></i></button></a><a id='delete-PUR'><button class='btn' type='button'><i class='fa fa-trash' style='color:#ff0000;'></i></button></a></td></tr>")
+      })
+
+    });
+
+    $('#new-purchase-table').on('click','#delete-PUR',function(){
+      var tr = $(this).closest('tr');
+      tr.remove();
+    });
+
+    $('#new-purchase-table').on('click','#add-PUR',function(){
+      var total = 0;
+      var tr = $(this).closest('tr');
+      var priceTd = tr.find('td:eq(5)');
+      var unitTd = tr.find('td:eq(3)');
+      var stTd = tr.find('td:eq(7)');
+      var stATd = tr.find('td:eq(8)');
+      var vod = tr.find('td:eq(6)');
+      var total = tr.find('td:eq(9)');
+      totalInput = total.find('input');
+      stAInput = stATd.find('input');
+      vog = vod.find('input');
+      var plus_button = tr.find('td:eq(10)');
+      plus = plus_button.find('#add-PUR');
+      plus.attr('hidden','true');
+      pencil_button = plus_button.find('#edit-PUR');
+      pencil_button.removeAttr('hidden');
+      stInput = stTd.find("input")
+      stInput.attr('disabled', 'disabled');
+      unitInput = unitTd.find('input');
+      unitInput.attr('disabled','disabled');
+      priceInput = priceTd.find('input');
+      priceInput.attr('disabled','disabled');
+      vog.attr('value',(unitInput.val()*priceInput.val()));
+      stAInput.attr('value',(stInput.val()/100)*vog.val());
+      totalInput.attr('value', (parseInt(stAInput.val())+parseInt(vog.val())));
+      var table = $("#new-purchase-table")
+      // table.find('tr').each(function (i, el){
+      //   if (i!=0){
+      //     var tds = $(this).find('td');
+      //     var row = {
+      //         'Total' : 0
+      //     };
+      //     tds.each(function(i, el){
+      //       if (i == 9){
+      //         row['Total'] = row['Total'] + $(this).val();
+      //         console.log(row['Total'])
+      //       }
+      //     })
+      //   }
+      // })
+      // $("#cartage_amount_purchase").val(total);
+    });
+
+    $('#new-purchase-table').on('click','#edit-PUR',function(){
+      var tr = $(this).closest('tr');
+      var priceTd = tr.find('td:eq(5)');
+      var unitTd = tr.find('td:eq(3)');
+      var stTd = tr.find("td:eq(7)");
+      var plus_button = tr.find('td:eq(10)');
+      plus = plus_button.find('#edit-PUR');
+      plus.attr('hidden','true');
+      pencil_button = plus_button.find('#add-PUR');
+      pencil_button.removeAttr('hidden');
+      stInput = stTd.find('input');
+      stInput.removeAttr('disabled');
+      unitInput = unitTd.find('input');
+      unitInput.removeAttr('disabled');
+      priceInput = priceTd.find('input');
+      priceInput.removeAttr('disabled');
+    });
+
+    $("#pur-account_title").on('change', function(){
+      main_object_id = this.value;
+      req =	$.ajax({
+       headers: { "X-CSRFToken": getCookie("csrftoken") },
+       type: 'POST',
+       url : '/transaction/purchase/new',
+       data:{
+         'main_object_id':main_object_id ,
+         'samp':"projectUpdate",
+       },
+       dataType: 'json'
+      })
+      .done(function done(data) {
+        sub_menu = JSON.parse(data.sub_menu)
+        $('#pur-project_id').empty()
+        $('#pur-project_id').append($("<option></option>").attr("value",0).text("Select: "));
+        for (var i = 0; i < sub_menu.length; i++) {
+            $('#pur-project_id').append($("<option></option>").attr("value",sub_menu[i].pk).text(sub_menu[i].fields["projectName"]));
+        }
+
+      })
+    });
+
+
+
+    $("#new-purchase-submit").on('submit',function(e){
+        e.preventDefault();
+        var table = $('#new-purchase-table');
+        var data = [];
+
+        table.find('tr').each(function (i, el){
+            if(i != 0)
+            {
+                var $tds = $(this).find('td');
+                var row = {
+                    'ItemCode' : "",
+                    'Desc':"",
+                    'Qty':"",
+                    'Unit':"",
+                    'Price':"",
+                    'ST':"",
+                };
+                $tds.each(function(i, el){
+                    if(i == 1){
+                        row['ItemCode'] = ($(this).text());
+                    }
+                    else if (i == 2){
+                        row['Desc'] = ($(this).text());
+                    }
+                    else if (i == 3){
+                        row["Qty"] = ($(this).find('input')).text();
+                    }
+                    else if (i == 4){
+                        row["Unit"] = ($(this).text());
+                    }
+                    else if (i == 5){
+                        row["Price"] = ($(this).text());
+                    }
+                    else if(i == 7){
+                        row["ST"] = ($(this).text());
+                    }
+                });
+                data.push(row);
+                console.log(data);
+
+            }
+        });
+        req =	$.ajax({
+         headers: { "X-CSRFToken": getCookie("csrftoken") },
+         type: 'POST',
+         url : '/transaction/purchase/new',
+         data:{
+           'main_object_id':JSON.stringify(data),
+           'paymentMethod':$("#pur-credit_days").val(),
+           'client':$("#pur-account_title option:selected").text(),
+           'project':$("#pur-project_id option:selected").val(),
+           'samp':"item",
+         },
+         dataType: 'json'
+        })
+        .done(function done(){
+          location.reload();
+        })
+        // req =   $.ajax({
+        //             headers: { "X-CSRFToken": getCookie("csrftoken") },
+        //             type: 'POST',
+        //             url : '/projects/add',
+        //             data:{
+        //                 'projectName': $("#projectName").val(),
+        //                 'amount': $("#Amount").val(),
+        //                 'narration': $("#description").val(),
+        //                 'payMethod': $("#paymentMethod option:selected").val(),
+        //                 'client':$("#clients option:selected").val(),
+        //                 'items': JSON.stringify(data)
+        //             },
+        //             dataType: 'json'
+        //         })
+        // .done(function done(data){
+        //     console.log('Success');
+        //     $("#projectName").val("");
+        //     $("#Amount").val("");
+        //     $("#description").val("");
+        //     location.reload();
+        // })
+    });
+
+  </script>
+
+{% endblock %}

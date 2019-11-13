@@ -1,0 +1,246 @@
+{% extends 'construction/base.html' %}
+{% block content %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <div class="container-fluid">
+        <div class="card" style="width:100%;">
+            <div class="card-header">
+                <h4>New Project</h4>
+            </div>
+            <ul class="list-group list-group-flush">
+                <form method="POST" id='add-project-with-inventory'>
+                    {% csrf_token %}
+                    <li class="list-group-item">
+                        <div class="form-row">
+
+                                <div class="form-group col-md-2">
+                                <label for="">Project Title</label>
+                                <input type="text" class="form-control form-control-sm"  id="projectName">
+                                </div>
+                                <div class="form-group col-md-2">
+                                    <label for="">Payment Method</label>
+                                    <select class="form-control form-control-sm main_drop" id="paymentMethod">
+                                    <option value="">Select:</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Credit">Credit</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group col-md-2" id="divAmount">
+                                    <label for="">Amount</label>
+                                    <input type="text" class="form-control form-control-sm"  id="Amount">
+                                </div>
+
+                                <div class="form-group col-md-2">
+                                        <label for="">Client</label>
+                                        <select class="form-control form-control-sm main_drop" id="clients">
+                                        <option value="">Select:</option>
+                                        {% for account in accounts %}
+                                            <option value="{{ account.accountId }}">{{ account.accountTitle }}</option>
+                                        {% endfor %}
+                                        </select>
+                                    </div>
+
+                                <div class="form-group col-md-3">
+                                    <label for="">Description</label>
+                                    <textarea name="name" class="form-control form-control-sm" rows="" cols="25" id="description" style="height:30px; width:275px;"></textarea>
+                                </div>
+
+                        </div>
+
+                        </li>
+                        <div class="card-header">
+                                <h4>Inventory</h4>
+                            </div>
+                            <li class="list-group-item">
+                                    <div class="form-row">
+                                            <div class="form-group col-md-2">
+                                              <label for="">Item Category</label>
+                                              <select class="form-control form-control-sm main_drop" id="itemCategory">
+                                                <option value="">Select:</option>
+                                                {% for cat in category %}
+                                                <option value="{{ cat.categoryId }}">{{ cat }}</option>
+                                                {% endfor %}
+
+                                              </select>
+                                            </div>
+
+                                            <div class="form-group col-md-2">
+                                              <label for="">Item Name</label>
+                                              <input type="text" class="form-control form-control-sm"  id="itemName">
+                                            </div>
+
+                                            <div class="form-group col-md-1">
+                                                <label for="">Quantity</label>
+                                                <input type="text" class="form-control form-control-sm"  id="itemQuantity">
+                                            </div>
+
+                                            <div class="form-group col-md-2">
+                                                <label for="">Unit Price</label>
+                                                <input type="text" class="form-control form-control-sm"  id="unitPrice">
+                                            </div>
+                                            <div class="form-group col-md-2">
+                                                <label for="">Unit</label>
+                                                <input type="text" class="form-control form-control-sm"  id="unit">
+                                            </div>
+
+                                            <div class="form-group col-md-2">
+                                                <label for="" style='color:#ffffff;'></label>
+                                                <br>
+                                                <button type="button" id="inventory-add-in-table" class="btn"><i class="fas fa-plus" style='color:#2eb82e;'></i></button>
+                                            </div>
+
+                                          </div>
+
+
+                                    </li>
+                                    <li class="list-group-item">
+                                        <div class="table table-responsive">
+                                    <table class="table table-bordered" id="add-project-table">
+                                            <thead>
+                                                <tr>
+                                                    <th width='20px'>S. No</th>
+                                                    <th style='display: none;'>CatId</th>
+                                                    <th width='130px'>Item Category</th>
+                                                    <th width='130px'>Item Name</th>
+                                                    <th width='130px'>Quantity</th>
+                                                    <th width='130px'>Unit</th>
+                                                    <th width='130px'>Unit Price</th>
+                                                    <th width='130px'>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                            </li>
+                                <br>
+                                <div class="text-center">
+                                  <button type="submit" class="btn btn-outline-primary" id="button">Submit <small>(Items)</small></button>
+                                </div>
+
+
+                </form>
+            </ul></div>
+            <script>
+            // $("#divAmount").hide();
+            // function dropdown(){
+            //     if (document.getElementById("#paymentMethod").value() == 0){
+            //         $('#divAmount').show();
+            //     }
+            //     else{
+            //         $('#divAmount').hide();
+            //     }
+            // }
+            function getCookie(c_name)
+			{
+			    if (document.cookie.length > 0)
+			    {
+			        c_start = document.cookie.indexOf(c_name + "=");
+			        if (c_start != -1)
+			        {
+			            c_start = c_start + c_name.length + 1;
+			            c_end = document.cookie.indexOf(";", c_start);
+			            if (c_end == -1) c_end = document.cookie.length;
+			            return unescape(document.cookie.substring(c_start,c_end));
+			        }
+			    }
+			    return "";
+			 }
+
+                // $("#button").click(function(){
+                //     req =	$.ajax({
+                // 				headers: { "X-CSRFToken": getCookie("csrftoken") },
+                // 				type: 'POST',
+                // 				url : '/projects/add',
+                // 				data:{
+
+                // 				},
+                // 				dataType: 'json'
+                // 			})
+                //             .done(function done(data){
+
+                //             })
+                // });
+                count = 1
+                $("#inventory-add-in-table").click(function(){
+                    if ($("#itemName").val() != null){
+                    $("#add-project-table").append("<tr><td>"+ count +"</td><td style='display:none;'>"+ $("#itemCategory option:selected").val() +"</td><td>"+ $("#itemCategory option:selected").text() +"</td><td>"+ $("#itemName").val() +"</td><td>"+ $("#itemQuantity").val() +"</td><td>"+ $("#unit").val() +"</td><td>"+ $("#unitPrice").val() +"</td><td><a id='inventory-table-delete'><button class='btn'><i class='fa fa-trash' style='color:#ff1a1a;'></i></button></a></td></tr>");
+                    $("#itemName").val("");
+                    $("#itemQuantity").val("");
+                    $("#unitPrice").val("");
+                    $("#unit").val("");
+                    count++;
+                }
+                })
+
+                $("#add-project-with-inventory").on('submit',function(e){
+                  e.preventDefault(e);
+                    var table = $('#add-project-table');
+                    var data = [];
+
+                    table.find('tr').each(function (i, el){
+                        if(i != 0)
+                        {
+                            var $tds = $(this).find('td');
+                            var row = {
+                                'ItemCategory' : "",
+                                'ItemCategoryVal':"",
+                                'ItemName':"",
+                                'ItemQuantity':"",
+                                'Unit':"",
+                                'UnitPrice':""
+                            };
+                            $tds.each(function(i, el){
+                                if(i == 1){
+                                    row['ItemCategoryVal'] = ($(this).text());
+                                }
+                                else if (i == 2){
+                                    row['ItemCategory'] = ($(this).text());
+                                }
+                                else if (i == 3){
+                                    row["ItemName"] = ($(this).text());
+                                }
+                                else if (i == 4){
+                                    row["ItemQuantity"] = ($(this).text());
+                                }
+                                else if (i == 5){
+                                    row["Unit"] = ($(this).text());
+                                }
+                                else if(i == 6){
+                                    row["UnitPrice"] = ($(this).text());
+                                }
+                            });
+                            data.push(row);
+                            console.log(data);
+                        }
+                    });
+
+                    req =   $.ajax({
+                                headers: { "X-CSRFToken": getCookie("csrftoken") },
+                                type: 'POST',
+                                url : '/projects/add',
+                                data:{
+                                    'projectName': $("#projectName").val(),
+                                    'amount': $("#Amount").val(),
+                                    'narration': $("#description").val(),
+                                    'payMethod': $("#paymentMethod option:selected").val(),
+                                    'client':$("#clients option:selected").val(),
+                                    'items': JSON.stringify(data)
+                                },
+                                dataType: 'json'
+                            })
+                    .done(function done(data){
+                        console.log('Success');
+                        $("#projectName").val("");
+                        $("#Amount").val("");
+                        $("#description").val("");
+                        location.reload();
+                    })
+                });
+
+                $("#add-project-table tbody").on('click','#inventory-table-delete', function(){
+                    var tr = $(this).closest('tr');
+                    tr.remove();
+                })
+            </script>
+{% endblock %}

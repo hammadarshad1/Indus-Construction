@@ -1,0 +1,290 @@
+{% extends 'construction/base.html' %}
+{% block content %}
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Journal Voucher</h4>
+</div>
+<ul class="list-group list-group-flush">
+<form  action="" id="new-jv-form" autocomplete="off"  method="post">
+  {% csrf_token %}
+  <li class="list-group-item">
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label for="">Transaction ID</label>
+          <input type="text" readonly class="form-control form-control-sm" required value="{{ get_last_tran_id }}" id="tran_id">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Document #</label>
+          <input type="text" list="inv_no" id="doc_no" class="form-control form-control-sm"/>
+          <datalist class="" id="inv_no">
+            {% for v in all_invoices %}
+              <option value="{{v.sale_no}}">{{v.sale_no}}</option>
+            {% endfor %}
+          </datalist>
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Document Date</label>
+          <input type="date"  class="form-control form-control-sm" required value="" id="doc_date">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Customer</label>
+          <select class="form-control form-control-sm" id="jv_customer_title">
+            <option value="">Select Account:</option>
+            {% for value in chartofaccount %}
+            <option value="{{value.id}}">{{value.account_title}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Project</label>
+          <select class="form-control form-control-sm" id="jv_project_id">
+            <option value="">Select Project:</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label for="">Description</label>
+          <textarea name="name" class="form-control" style="width:370px; height:30px;" id="description"></textarea>
+        </div>
+      </div>
+      </li>
+      <!-- <li class="list-group-item">
+      <div class="form-row">
+        <label class="checkbox-inline"><b>Cheque Info</b>
+          <input type="checkbox" value="" onclick="cheque_enable(this.checked)">
+        </label>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label for="">Cheque #</label>
+          <input type="text" disabled class="form-control form-control-sm"  value="" id="cheque_no">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Cheque Date</label>
+          <input type="date" disabled  class="form-control form-control-sm"  value="" id="cheque_date">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+          <label class="">Realize<input type="radio" disabled name="optradio" id="realize"></label>&nbsp;
+          <label class="">Un-Realize<input type="radio" disabled name="optradio" id="un-realize"></label>
+        </div>
+      </div>
+    </li> -->
+    <li class="list-group-item">
+    <div class="table-title">
+        <div class="row">
+          <div class="col-md-2">
+            <label for="">Account</label>
+            <select class="form-control form-control-sm" id="jv-account_title">
+              <option value="">Select Account:</option>
+              {% for value in chartofaccount %}
+              <option value="{{value.id}}">{{value.account_title}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="">Project</label>
+            <select class="form-control form-control-sm" id="jv-project_id">
+              <option value="">Select Project:</option>
+              <!-- {% for value in projects %}
+              <option value="{{value.projectId}}">{{value.projectName}}</option>
+              {% endfor %} -->
+            </select>
+          </div>
+          <div class="form-group col-md-2">
+            <input type="text" style="display:none;" class="form-control form-control-sm" value="0" id="check_no">
+          </div>
+            <div style="margin-left:-190px; margin-top:31px;">
+                <button type="button" class="btn btn-sm btn-info add-item-jv" id='insert-jv-account-to-table'><i class="fa fa-plus"></i> Insert Account</button>
+            </div>
+        </div>
+    </div>
+    <div class="table table-responsive">
+      <table class="table table-bordered" id="new-jv-table">
+          <thead>
+              <tr>
+                  <th width="150px" style="">Account ID</th>
+                  <th width="250px">Account Title</th>
+                  <th width="250px">Debit</th>
+                  <th width="250px">Credit</th>
+                  <th>Action</th>
+              </tr>
+          </thead>
+          <tbody>
+          </tbody>
+      </table>
+    </div>
+    </li>
+      <br>
+    <div class="text-center">
+      <button type="submit" class="btn btn-outline-primary">Submit <small>(Journal Voucher)</small></button>
+    </div>
+    <br>
+</form>
+</ul>
+</div>
+
+<script type="text/javascript">
+  function getCookie(c_name)
+{
+if (document.cookie.length > 0)
+{
+    c_start = document.cookie.indexOf(c_name + "=");
+    if (c_start != -1)
+    {
+        c_start = c_start + c_name.length + 1;
+        c_end = document.cookie.indexOf(";", c_start);
+        if (c_end == -1) c_end = document.cookie.length;
+        return unescape(document.cookie.substring(c_start,c_end));
+    }
+}
+return "";
+}
+
+$("#insert-jv-account-to-table").on('click',function(){
+  $("#new-jv-table tbody").append("<tr><td>"+ $("#jv-account_title option:selected").val() +"</td><td>"+ $("#jv-account_title option:selected").text() +"</td><td><input type='text' class='form-control form-control-sm' name='debit' value='0.0'></td><td><input type='text' class='form-control form-control-sm' name='credit' value='0.0'></td><td><a id='edit-JV' hidden='hidden'><button class='btn' type='button'><i class='fas fa-pencil-alt' style='color:#e6e600;'></i></button></a><a id='add-JV'><button class='btn' type='button'><i class='fas fa-plus' style='color:#00b300;'></i></button></a><a id='delete-JV'><button class='btn' type='button'><i class='fa fa-trash' style='color:#ff0000;'></i></button></a></td></tr>")
+});
+
+$('#new-jv-table').on('click','#add-JV',function(){
+  var tr = $(this).closest('tr');
+  var debitTd = tr.find('td:eq(2)');
+  var creditTd = tr.find('td:eq(3)');
+  var plus_button = tr.find('td:eq(4)');
+  plus = plus_button.find('#add-JV');
+  plus.attr('hidden','true');
+  pencil_button = plus_button.find('#edit-JV');
+  console.log(pencil_button)
+  pencil_button.removeAttr('hidden');
+  debitInput = debitTd.find('input');
+  debitInput.attr('disabled','disabled');
+  creditInput = creditTd.find('input');
+  creditInput.attr('disabled','disabled');
+});
+
+$("#new-jv-table").on('click','#edit-JV',function(){
+  var tr = $(this).closest('tr');
+  var debitTd = tr.find('td:eq(2)');
+  var creditTd = tr.find('td:eq(3)');
+  debitInput = debitTd.find('input');
+  debitInput.removeAttr('disabled');
+  creditInput = creditTd.find('input');
+  creditInput.removeAttr('disabled');
+  var plus_button = tr.find('td:eq(4)');
+  plus = plus_button.find("#add-JV");
+  plus.removeAttr('hidden');
+  plus_button = plus_button.find('#edit-JV');
+  plus_button.attr('hidden','hidden')
+  console.log(plus_button);
+});
+
+  $("#jv-account_title").on('change', function(){
+    main_object_id = this.value;
+    req =	$.ajax({
+     headers: { "X-CSRFToken": getCookie("csrftoken") },
+     type: 'POST',
+     url : '/transaction/journal_voucher/new',
+     data:{
+       'main_object_id':main_object_id ,
+       'samp':"projectUpdate",
+     },
+     dataType: 'json'
+    })
+    .done(function done(data) {
+      sub_menu = JSON.parse(data.sub_menu);
+      $('#jv-project_id').empty()
+      $('#jv-project_id').append($("<option></option>").attr("value",3).text("General"));
+      console.log(sub_menu);
+      for (var i = 0; i < sub_menu.length; i++) {
+          $('#jv-project_id').append($("<option></option>").attr("value",sub_menu[i].pk).text(sub_menu[i].fields["projectName"]));
+      }
+
+    })
+  });
+
+  $("#jv_customer_title").on('change', function(){
+    main_object_id = this.value;
+    req =	$.ajax({
+     headers: { "X-CSRFToken": getCookie("csrftoken") },
+     type: 'POST',
+     url : '/transaction/journal_voucher/new',
+     data:{
+       'main_object_id':main_object_id ,
+       'samp':"projectUpdate",
+     },
+     dataType: 'json'
+    })
+    .done(function done(data) {
+      sub_menu = JSON.parse(data.sub_menu);
+      $('#jv_project_id').empty()
+      $('#jv_project_id').append($("<option></option>").attr("value",3).text("General"));
+      console.log(sub_menu);
+      for (var i = 0; i < sub_menu.length; i++) {
+          $('#jv_project_id').append($("<option></option>").attr("value",sub_menu[i].pk).text(sub_menu[i].fields["projectName"]));
+      }
+
+    })
+  });
+
+
+  $("#new-jv-form").on('submit', function(e){
+    e.preventDefault();
+      var table = $('#new-jv-table');
+      var data = [];
+      var debit = 0;
+      var credit = 0;
+
+      table.find('tr').each(function (i, el){
+          if(i != 0)
+          {
+              var $tds = $(this).find('td');
+              var row = {
+                  'AccountId' : "",
+                  'Debit':"",
+                  'Credit':"",
+              };
+              $tds.each(function(i, el){
+                  if(i == 0){
+                    console.log($(this).text());
+                      row['AccountId'] = ($(this).text());
+                  }
+                  else if (i == 2){
+                      row['Debit'] = ($(this).find('input').val());
+                      debit = debit + parseFloat(($(this).find('input').val()));
+                  }
+                  else if (i == 3){
+                      row["Credit"] = ($(this).find('input').val());
+                      credit = credit + parseFloat(($(this).find('input').val()));
+                  }
+              });
+              data.push(row);
+          }
+      });
+      if (debit == credit) {
+        req =   $.ajax({
+                    headers: { "X-CSRFToken": getCookie("csrftoken") },
+                    type: 'POST',
+                    url : '/transaction/journal_voucher/new',
+                    data:{
+                        'items': JSON.stringify(data),
+                        'date': $("#doc_date").val(),
+                        'documentNo': $("#doc_no").val(),
+                        'transactionId': $("#tran_id").val(),
+                        'description': $("#description").val(),
+                        'check':$("#check_no").val(),
+                        'project': $("#jv-project_id option:selected").val(),
+                        'accountId': $("#jv_customer_title option:selected").val(),
+                        'data':JSON.stringify(data),
+                    },
+                    dataType: 'json'
+                })
+        .done(function done(data){
+            location.reload();
+        })
+      } else {
+        alert("Debit and Credit sides are not same")
+      }
+  })
+</script>
+
+{% endblock %}

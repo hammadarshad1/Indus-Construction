@@ -1,0 +1,348 @@
+{% extends 'construction/base.html' %}
+{% block content %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Chart Of Account</h4>
+</div>
+<ul class="list-group list-group-flush">
+  <li class="list-group-item">
+    <br>
+    <ul style="list-style-type:none;" class="messages">
+      {% if messages %}
+        {% for msg in messages %}
+          <li>
+            <div class="alert {{msg.level_tag}}">
+              {{msg.message}}
+            </div>
+          </li>
+        {% endfor %}
+      {% endif %}
+    </ul>
+    <br>
+    <form class="" action="{% url 'chart-of-account' %}" method="post" autocomplete="off">
+      {% csrf_token %}
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                      <div class="table table-responsive">
+                      <table class="table table-bordered " id="dataTable">
+                          <thead>
+                              <tr>
+                                  <th width="40px">S NO.</th>
+                                  <th width="550px">Account Title</th>
+                                  <td>Action</td>
+                              </tr>
+                          </thead>
+                          <tbody>
+                            {% for value in all_accounts %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td style="display:none;" >{{ value.id }}</td>
+                                <td>{{ value.account_title }}</td>
+                                <td style="display:none;" >{{ value.parent_id }}</td>
+                                <td style="display:none;" >{{ value.opening_balance }}</td>
+                                <td style="display:none;" >{{ value.phone_no }}</td>
+                                <td style="display:none;" >{{ value.email_address }}</td>
+                                <td style="display:none;" >{{ value.ntn }}</td>
+                                <td style="display:none;" >{{ value.stn }}</td>
+                                <td style="display:none;" >{{ value.cnic }}</td>
+                                <td style="display:none;" >{{ value.Address }}</td>
+                                <td style="display:none;" >{{ value.remarks }}</td>
+                                <td style="display:none;" >{{ value.credit_limit }}</td>
+                                <td>
+                                  <a class="edit_list has_id" href="#" data-toggle="modal" data-target="#editCoaModal" id="{{value.id}}"><i class="fas fa-pencil-alt" style="color: #ffcc00"></i></a>
+                                  <a class="delete-chart-of-account" href="#" data-toggle="modal" data-target="#deleteCoaModal" id="{{value.id}}"><i class="fa fa-trash" style="color:#ff1a1a;"></i></a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                          </tbody>
+                      </table>
+                    </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body">
+          <div class="float-right">
+            <form>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">Account Title:</label>
+                <div class="col-sm-8">
+                  <input type="select" class="form-control form-control-sm" required name="account_title" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">Account Type:</label>
+                <div class="col-sm-8">
+                  <select class="form-control" name="account_type">
+                    <option value="12">Customer</option>
+                    <option value="13">Supplier</option>
+                    <option value="26">Cash at Bank</option>
+                  {% for account in all_accounts %}
+                    <option value="{{account.id}}">{{account.account_title}}</option>
+                  {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label" >Opening Balance:</label>
+                <div class="col-sm-4">
+                  <input type="text" class="form-control form-control-sm" name="opening_balance" placeholder="">
+                </div>
+                <div class="col-md-4">
+                  <label><input type="radio" name="optradio" value="debit" checked>Dr.</label>&nbsp;
+                  <label><input type="radio" name="optradio" value="credit">Cr.</label>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">Phone No:</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" name="phone_no" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">Email Address:</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" name="email_address" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">NTN:</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" name="ntn" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">STN:</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" name="stn" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">CNIC:</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" name="cnic" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">Address:</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" name="address" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">Remarks:</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" name="remarks" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">Credit Limits:</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" name="credit_limits" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label"></label>
+                <div class="col-sm-8">
+                  <input type="submit" class="btn btn-outline-primary form-control" placeholder="" value="Create">
+                </div>
+              </div>
+            </form>
+              </div>
+              </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+    </div>
+    </form>
+  </li>
+  </ul>
+</div>
+
+
+        <div class="modal fade" id="editCoaModal">
+          <div class="modal-dialog">
+            <div class="modal-content">
+
+              <!-- Modal Header -->
+              <div class="modal-header">
+                <h4 class="modal-title">Edit Account</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+              </div>
+
+              <!-- Modal body -->
+             <form action="{% url 'edit-chart-of-account' %}" method="post"  autocomplete="off">
+               {% csrf_token %}
+              <div class="modal-body">
+                  <div class="form-group row">
+                    <label for="" class="col-sm-4 form-control-sm col-form-label">Account Title:</label>
+                    <div class="col-sm-8">
+                      <input type="text" style="display:none;" name="id" id="id" value="">
+                      <input type="select" class="form-control form-control-sm" required name="account_title" id="account_title" placeholder="">
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="" class="col-sm-4 form-control-sm col-form-label">Account Type:</label>
+                    <div class="col-sm-4">
+                      <select class="form-control" name="account_type" id="account_type">
+                        <option value="13">Customer</option>
+                        <option value="12">Supplier</option>
+                        <option value="26">Cash at Bank</option>
+                      {% for account in all_accounts %}
+                        <option value="{{account.id}}">{{account.account_title}}</option>
+                      {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="" class="col-sm-4 form-control-sm col-form-label" >Opening Balance:</label>
+                    <div class="col-sm-4">
+                      <input type="text" class="form-control form-control-sm" name="opening_balance" id="opening_balance" placeholder="">
+                    </div>
+                    <div class="col-md-4">
+                      <label><input type="radio" name="optradio" id="debit" value="debit">Dr.</label>&nbsp;
+                      <label><input type="radio" name="optradio" id="credit" value="credit">Cr.</label>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="" class="col-sm-4 form-control-sm col-form-label">Phone No:</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control form-control-sm" name="phone_no" id="phone_no" placeholder="">
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="" class="col-sm-4 form-control-sm col-form-label">Email Address:</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control form-control-sm" name="email_address" id="email_address" placeholder="">
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="" class="col-sm-4 form-control-sm col-form-label">NTN:</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control form-control-sm" name="ntn" id="ntn" placeholder="">
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="" class="col-sm-4 form-control-sm col-form-label">STN:</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control form-control-sm" name="stn" id="stn" placeholder="">
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="" class="col-sm-4 form-control-sm col-form-label">CNIC:</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control form-control-sm" name="cnic" id="cnic" placeholder="">
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="" class="col-sm-4 form-control-sm col-form-label">Address:</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control form-control-sm" name="address" id="address" placeholder="">
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="" class="col-sm-4 form-control-sm col-form-label">Remarks:</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control form-control-sm" name="remarks" id="remarks" placeholder="">
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="" class="col-sm-4 form-control-sm col-form-label">Credit Limits:</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control form-control-sm" name="credit_limits" id="credit_limits" placeholder="">
+                    </div>
+                  </div>
+              </div>
+              <!-- Modal footer -->
+              <div class="modal-footer">
+                <div class="form-group row">
+                  <label for="" class="col-sm-12 form-control-sm col-form-label"></label>
+                  <div class="col-sm-12">
+                    <input type="submit" class="btn btn-outline-primary form-control" placeholder="" value="Update">
+                    <!-- {% if permission.add == 1 %}
+                    <input type="submit" class="btn btn-outline-primary form-control" placeholder="" value="Create">
+                    {% else %}
+                    <input disabled class="btn btn-outline-primary form-control" placeholder="" value="Create">
+                    {% endif %} -->
+                  </div>
+                </div>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delete Modal-->
+        <div class="modal fade" id="deleteCoaModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Delete Account</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div class="modal-body">Are you sure you want to delete?</div>
+              <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <a class="btn btn-danger" href="" id="modal_delete_button">Delete</a>
+              </div>
+            </div>
+          </div>
+        </div>
+          <!-- Modal -->
+
+<script type="text/javascript">
+  $('#dataTable tbody').on('click','.edit_list',function(){
+			var currrow = $(this).closest('tr');
+			var id = currrow.find('td:eq(1)').text();
+			var account_title = currrow.find('td:eq(2)').text();
+			var parent_type = currrow.find('td:eq(3)').text();
+			var opening_balance = currrow.find('td:eq(4)').text();
+			var phone_no = currrow.find('td:eq(5)').text();
+			var email_address = currrow.find('td:eq(6)').text();
+			var ntn = currrow.find('td:eq(7)').text();
+			var stn = currrow.find('td:eq(8)').text();
+			var cnic = currrow.find('td:eq(9)').text();
+			var address = currrow.find('td:eq(10)').text();
+			var remarks = currrow.find('td:eq(11)').text();
+			var credit_limit = currrow.find('td:eq(12)').text();
+			console.log(id);
+			if (opening_balance > 0) {
+				$('#debit').prop("checked", true);
+			} else {
+				$('#credit').prop("checked", true);
+			}
+			opening_balance = Math.abs(opening_balance);
+			$('#id').val(id);
+			$('#account_title').val(account_title);
+			$('#opening_balance').val(opening_balance);
+			$('#phone_no').val(phone_no);
+			$('#email_address').val(email_address);
+			$('#ntn').val(ntn);
+			$('#stn').val(stn);
+			$('#cnic').val(cnic);
+			$('#address').val(address);
+			$('#remarks').val(remarks);
+			$('#credit_limits').val(credit_limit);
+	 })
+
+   $(".delete-chart-of-account").on('click',function(){
+    $("#modal_delete_button").attr("href", `/chart_of_account/delete/${this.id}`);
+  })
+</script>
+
+{% endblock content %}

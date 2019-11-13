@@ -1,0 +1,41 @@
+from django.urls import path
+from .views import (home, addProject, addCategory, inventory, chart_of_account, project, delete_project,
+delete_inventory_category, delete_inventory, delete_chartofaccount,
+ journal_voucher, journal_voucher_new, delete_journal_voucher, cash_receiving_voucher, cash_receiving_voucher_new,
+ bank_receiving_voucher, bank_receiving_voucher_new, edit_chart_of_account, delete_chart_of_account, cash_payment_voucher,
+ cash_payment_voucher_new, bank_payment_voucher, bank_payment_voucher_new, delete_journal_voucher,jv_pdf,crv_pdf, purchase, purchase_new, brv_pdf,
+ cpv_pdf, bpv_pdf)
+
+urlpatterns = [
+    path('', home, name='Home'),
+    # path('inventory/add',views.addInventory,name='Add-Inventory')
+    path('projects/add', addProject, name='Add-Project'),
+    path('inventory/category',addCategory,name='Add-Category'),
+    path('inventory/',inventory,name='Inventory'),
+    path('projects/',project,name='Project'),
+    path('project/delete/<pk>', delete_project, name = 'Delete-Project'),
+    path('inventory/category/delete/<pk>',delete_inventory_category, name = 'Delete-Inventory-Category'),
+    path('inventory/delete/<pk>', delete_inventory, name= 'Delete-Inventory'),
+    path('chartofaccount/delete/<pk>',delete_chartofaccount, name='Delete-ChartOfAccount'),
+    path('transaction/journal_voucher/delete/<pk>', delete_journal_voucher, name='Delete-Journal-Voucher'),
+    path('chart_of_account/new', chart_of_account, name = 'chart-of-account'),
+    path('chart_of_account/edit', edit_chart_of_account, name = 'edit-chart-of-account'),
+    path('chart_of_account/delete/<pk>', delete_chart_of_account, name = 'delete-chart-of-account'),
+    path('transaction/journal_voucher',journal_voucher, name='Journal-Voucher'),
+    path('transaction/journal_voucher/new',journal_voucher_new, name='new-journal-voucher'),
+    path('transaction/cash_receiving_voucher',cash_receiving_voucher, name='Cash-Receiving-Voucher'),
+    path('transaction/bank_receiving_voucher',bank_receiving_voucher, name='Bank-Receiving-Voucher'),
+    path('transaction/cash_receiving_voucher/new', cash_receiving_voucher_new, name='Cash-Receiving-Voucher-New'),
+    path('transaction/bank_receiving_voucher/new', bank_receiving_voucher_new, name='Bank-Receiving-Voucher-New'),
+    path('transaction/cash_payment_voucher',cash_payment_voucher, name='Cash-Payment-Vocher'),
+    path('transaction/cash_payment_voucher/new',cash_payment_voucher_new, name='Cash-Payment-Vocher-New'),
+    path('transaction/bank_payment_voucher', bank_payment_voucher, name='Bank-Payment-Voucher'),
+    path('transaction/bank_payment_voucher/new',bank_payment_voucher_new, name='Bank-Payment-Voucher-New'),
+    path('transaction/purchase',purchase, name='Purchase'),
+    path('transaction/purchase/new',purchase_new, name='Purchase-New'),
+    path('jv_pdf/<pk>', jv_pdf, name='jv-pdf'),
+    path('crv_pdf/<pk>', crv_pdf, name='crv'),
+    path('brv_pdf/<pk>', brv_pdf, name='brv'),
+    path('cpv_pdf/<pk>', cpv_pdf, name='cpv'),
+    path('bpv_pdf/<pk>', bpv_pdf, name='bpv')
+]
