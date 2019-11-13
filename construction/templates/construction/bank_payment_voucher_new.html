@@ -59,7 +59,7 @@
                   {% endfor %}
                 </select>
               </div>
-                <div class="form-group col-md-2">
+                <div class="form-group col-md-1">
                   <label for="">Amount</label>
                   <input type="text" id="amount" class="form-control form-control-sm"/>
                 </div>
@@ -78,6 +78,7 @@
                     <th width="300px">Account Title</th>
                     <th width="100px">Debit</th>
                     <th width="100px">Credit</th>
+                    <th width='50px'>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -112,8 +113,14 @@ return "";
 }
 
     $(".load-invoices-bpv").on('click',function(){
-      $("#new-bpv-table tbody").append("<tr><td>"+ $("#bpv-account_title option:selected").val() +"</td><td>"+ $("#bpv-account_title option:selected").text() +"</td><td>"+$('#amount').val()+"</td><td>0.00</td></tr>")
+      $("#new-bpv-table tbody").append("<tr><td>"+ $("#bpv-account_title option:selected").val() +"</td><td>"+ $("#bpv-account_title option:selected").text() +"</td><td>"+$('#amount').val()+"</td><td>0.00</td><td><button class='btn' type='button' id='BPV-delete'><i class='fa fa-trash' style='color:red;'></i></button></td></tr>")
     });
+
+$("#new-bpv-table").on('click', '#BPV-delete', function(){
+  var tr = (this).closest('tr');
+  tr.remove();
+  $("#insert-bpv-account-to-table").removeAttr('disabled');
+});
 
 $('#new-bpv-table').on('click','#add-BPV',function(){
   var tr = $(this).closest('tr');
@@ -233,6 +240,10 @@ $("#new-bpv-table").on('click','#edit-BPV',function(){
     $("#insert-bpv-account-to-table").attr('disabled','disabled');
     }
     });
+
+    $("#insert-bpv-account-to-table").on('click',function(){
+      $("#insert-bpv-account-to-table").attr('disabled','disabled');
+    })
 </script>
 
 {% endblock %}

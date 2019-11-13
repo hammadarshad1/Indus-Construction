@@ -66,6 +66,7 @@
               <th width="250px">Account Title</th>
               <th width="250px">Debit</th>
               <th width="250px">Credit</th>
+              <th width='50px'>Action</th>
           </tr>
       </thead>
       <tbody>
@@ -85,8 +86,14 @@
 <script type="text/javascript">
 
   $("#insert-cpv-account-to-table").on('click',function(){
-    $("#new-cpv-table tbody").append("<tr><td>"+ $("#cpv-account_title option:selected").val() +"</td><td>"+ $("#cpv-account_title option:selected").text() +"</td><td>"+ $("#amount").val() +"</td><td>0.00</td></tr>")
+    $("#new-cpv-table tbody").append("<tr><td>"+ $("#cpv-account_title option:selected").val() +"</td><td>"+ $("#cpv-account_title option:selected").text() +"</td><td>"+ $("#amount").val() +"</td><td>0.00</td><td><button class='btn' type='button' id='delete-CPV'><i class='fa fa-trash' style='color:red;'></i></button></td></tr>")
   });
+
+$("#new-cpv-table").on('click',"#delete-CPV",function(){
+  var tr = (this).closest('tr');
+  tr.remove();
+  ("#insert-cpv-account-to-table").removeAttr('disabled');
+})
 
   $('#new-cpv-table').on('click','#add-CPV',function(){
     var tr = $(this).closest('tr');
@@ -220,6 +227,10 @@ return "";
   $("#insert-cpv-account-to-table").attr('disabled','disabled');
   }
   });
+
+  $("#insert-cpv-account-to-table").on('click', function(){
+    $(this).attr('disabled','disabled');
+  })
 
 </script>
 

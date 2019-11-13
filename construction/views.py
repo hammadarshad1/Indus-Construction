@@ -826,3 +826,27 @@ def cpv_pdf(request, pk):
         response['Content-Disposition'] = content
         return response
     return HttpResponse("Not found")
+
+@login_required
+def delete_cash_receiving_voucher(request, pk):
+    vc = VoucherHeader.objects.filter(voucherId=pk).delete()
+    print("deleted")
+    return redirect('Cash-Receiving-Voucher')
+
+@login_required
+def delete_bank_receiving_voucher(request, pk):
+    vc = VoucherHeader.objects.filter(voucherId=pk).delete()
+    print("deleted")
+    return redirect('Bank-Receiving-Voucher')
+
+@login_required
+def delete_cash_payment_voucher(request, pk):
+    vc = VoucherHeader.objects.filter(voucherId=pk).delete()
+    print("deleted")
+    return redirect('Cash-Payment-Vocher')
+
+@login_required
+def delete_bank_payment_voucher(request, pk):
+    vc = VoucherHeader.objects.filter(voucherId=pk).delete()
+    print("deleted")
+    return redirect('Bank-Receiving-Voucher')

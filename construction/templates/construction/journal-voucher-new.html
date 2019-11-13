@@ -162,6 +162,11 @@ $('#new-jv-table').on('click','#add-JV',function(){
   creditInput.attr('disabled','disabled');
 });
 
+$('#new-jv-table').on('click', '#delete-JV', function(){
+  var tr = $(this).closest('tr');
+  tr.remove();
+})
+
 $("#new-jv-table").on('click','#edit-JV',function(){
   var tr = $(this).closest('tr');
   var debitTd = tr.find('td:eq(2)');

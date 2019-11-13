@@ -78,6 +78,7 @@
                       <th width="300px">Account Title</th>
                       <th width="100px">Debit</th>
                       <th width="100px">Credit</th>
+                      <th width='50px'>Action</th>
                   </tr>
               </thead>
               <tbody>
@@ -115,8 +116,18 @@
 
 
     $(".load-invoices-brv").on('click',function(){
-      $("#new-brv-table tbody").append("<tr><td>"+ $("#brv-account_title option:selected").val() +"</td><td>"+ $("#brv-account_title option:selected").text() +"</td><td>0.00</td><td>"+$('#amount').val()+"</td></tr>")
+      $("#new-brv-table tbody").append("<tr><td>"+ $("#brv-account_title option:selected").val() +"</td><td>"+ $("#brv-account_title option:selected").text() +"</td><td>0.00</td><td>"+$('#amount').val()+"</td><td><button class='btn' type='button' id='delete-BRV'><i class='fa fa-trash' style='color:red'></i></button></td></tr>")
+      $("#insert-brv-account-to-table").attr('disabled','disabled');
     });
+
+$("#new-brv-table").on('click','#delete-BRV', function(){
+  var tr = $(this).closest('tr')
+  tr.remove();
+  var inp = $("#amount");
+  if (inp.val().length > 0) {
+  $("#insert-brv-account-to-table").removeAttr('disabled');
+}
+})
 
     $('#new-brv-table').on('click','#add-BRV',function(){
       var tr = $(this).closest('tr');
@@ -235,6 +246,7 @@
     else if(inp.val().length == 0) {
       $("#insert-brv-account-to-table").attr('disabled','disabled');
     }
+
   });
     </script>
 {% endblock %}
