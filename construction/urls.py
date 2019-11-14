@@ -4,7 +4,8 @@ delete_inventory_category, delete_inventory, delete_chartofaccount,
  journal_voucher, journal_voucher_new, delete_journal_voucher, cash_receiving_voucher, cash_receiving_voucher_new,
  bank_receiving_voucher, bank_receiving_voucher_new, edit_chart_of_account, delete_chart_of_account, cash_payment_voucher,
  cash_payment_voucher_new, bank_payment_voucher, bank_payment_voucher_new, delete_journal_voucher,jv_pdf,crv_pdf, purchase, purchase_new, brv_pdf,
- cpv_pdf, bpv_pdf, delete_cash_receiving_voucher, delete_bank_receiving_voucher, delete_cash_payment_voucher, delete_bank_payment_voucher)
+ cpv_pdf, bpv_pdf, delete_cash_receiving_voucher, delete_bank_receiving_voucher, delete_cash_payment_voucher, delete_bank_payment_voucher, view_journal_voucher, view_cash_receiving_voucher,
+ report, sale_summary_item_wise, account_ledger, trial_balance, sale_detail_item_wise)
 
 urlpatterns = [
     path('', home, name='Home'),
@@ -41,5 +42,12 @@ urlpatterns = [
     path('crv_pdf/<pk>', crv_pdf, name='crv'),
     path('brv_pdf/<pk>', brv_pdf, name='brv'),
     path('cpv_pdf/<pk>', cpv_pdf, name='cpv'),
-    path('bpv_pdf/<pk>', bpv_pdf, name='bpv')
+    path('bpv_pdf/<pk>', bpv_pdf, name='bpv'),
+    path('transaction/journal_voucher/view/<pk>', view_journal_voucher, name='View-Journal-Voucher'),
+    path('transaction/cash_receiving_voucher/view/<pk>', view_cash_receiving_voucher, name='View-Cash-Receiving-Voucher'),
+    path('transaction/report', report, name='Report'),
+    path('sale_summary_item_wise/pdf/', sale_summary_item_wise, name = 'sale-summary-item-wise'),
+    path('account_ledger/pdf/', account_ledger, name = 'account-ledger'),
+    path('trial_balance/pdf/', trial_balance, name = 'trial-balance'),
+    path('sale_detail_item_wise/pdf/', sale_detail_item_wise, name = 'sale-detail-item-wise'),
 ]

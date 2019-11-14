@@ -393,6 +393,7 @@ def journal_voucher_new(request):
 @login_required
 def delete_journal_voucher(request,pk):
     voucher = VoucherHeader.objects.filter(voucherId=pk).delete()
+    tran = Transactions.objects.filter(voucherId=pk).all().delete()
     print('deleted')
     return redirect('Journal-Voucher')
 
@@ -849,4 +850,112 @@ def delete_cash_payment_voucher(request, pk):
 def delete_bank_payment_voucher(request, pk):
     vc = VoucherHeader.objects.filter(voucherId=pk).delete()
     print("deleted")
-    return redirect('Bank-Receiving-Voucher')
+    return redirect('Bank-Payment-Voucher')
+
+@login_required
+def view_journal_voucher(request, pk):
+    jv_header = VoucherHeader.objects.filter(voucherId = pk).first()
+    jv_detail = VoucherDetail.objects.filter(voucherId = jv_header).all()
+    print(jv_header, jv_detail)
+    return render(request, 'construction/view-journal-voucher.html', {'title':f'View JV{pk}','jv_header':jv_header,'jv_detail':jv_detail})
+
+@login_required
+def view_cash_receiving_voucher(request, pk):
+    jv_header = VoucherHeader.objects.filter(voucherId = pk).first()
+    jv_detail = VoucherDetail.objects.filter(voucherId = jv_header).all()
+    print(jv_header, jv_detail)
+    return render(request, 'construction/view-cash-receiving-voucher.html', {'title':f'View JV{pk}','voucher_header':jv_header,'voucher_detail':jv_detail})
+
+@login_required
+def report(request):
+    all_accounts = ChartOfAccount.objects.all()
+    return render(request, 'construction/reports.html', {'title':'Reports','all_accounts':all_accounts})
+
+@login_required
+def sale_summary_item_wise(request):
+    total = 0
+    if request.method == "POST":
+        from_date = request.POST.get('from_date')
+        to_date = request.POST.get('to_date')
+        account_id = request.POST.get('account_id')
+        print(account_id)
+        company_info = CompanyInfo.objects.filter(id = 1).first()
+        print(company_info)
+        # image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
+        all_accounts = ChartOfAccount.objects.all()
+        cursor = connection.cursor()
+        cursor.execute('''Select item_code, item_name, item_description,Sum(Total) As TotalAmount From (
+                            select IP.product_code as item_code , IP.product_name as item_name, IP.product_desc as item_description, sum(SD.cost_price * SD.quantity) As Total
+                            from transaction_saleheader SH
+                            inner join inventory_add_products IP on IP.id = SD.item_id_id
+                            inner join transaction_saledetail SD
+                            on SD.sale_id_id = SH.id
+                            where SH.date Between %s And %s
+                            Group by item_code
+                            Union All
+                            select IP.product_code as item_code, IP.product_name as item_name, IP.product_desc as item_description, sum(SRD.cost_price * SRD.quantity) As Total
+                            from transaction_salereturnheader SRH
+                            inner join inventory_add_products IP on IP.id = SRD.item_id_id
+                            inner join transaction_salereturndetail SRD
+                            on SRD.sale_return_id_id = SRH.id
+                            where SRH.date Between %s And %s
+                            Group by item_code
+                            ) tblData
+                            group by item_code
+                             ''',[from_date, to_date,from_date, to_date, account_id])
+        row = cursor.fetchall()
+        for value in row:
+            total = total + value[5]
+        account_id = ChartOfAccount.objects.filter(id = account_id).first()
+        account_title = account_id.account_title
+        pdf = render_to_pdf('transaction/sale_summary_item_wise_pdf.html', {'company_info':company_info,'image':image,'row':row,'from_date':from_date, 'to_date':to_date,'total':total, 'all_accounts':all_accounts, 'account_title':account_title,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
+        if pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            filename = "Sale_Detail_Item_Wise%s.pdf" %("000")
+            content = "inline; filename='%s'" %(filename)
+            response['Content-Disposition'] = content
+            return response
+        return HttpResponse("Not found")
+    return redirect('report')
+
+@login_required
+def account_ledger(request):
+    pass
+
+@login_required
+def trial_balance(request):
+    if request.method == "POST":
+        debit_amount = 0
+        credit_amount = 0
+        from_date = request.POST.get('from_date')
+        to_date = request.POST.get('to_date')
+        print(from_date, to_date)
+        company_info = CompanyInfo.objects.filter(id=1).all()
+        cursor = connection.cursor()
+        cursor.execute('''Select id,account_title,ifnull(amount,0) + opening_balance As Amount
+                        from construction_chartofaccount
+                        Left Join
+                        (select accountId_id,sum(Amount) As Amount from construction_transactions
+                        Where construction_transactions.date Between %s And %s
+                        Group By accountId_id) As tbltran On construction_chartofaccount.id = tbltran.accountId_id
+                        ''',[from_date, to_date])
+                        # 'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser
+        row = cursor.fetchall()
+        for v in row:
+            if v[2] >= 0:
+                debit_amount = debit_amount + v[2]
+            else:
+                credit_amount = credit_amount + v[2]
+        pdf = render_to_pdf('construction/trial_balance_pdf.html', {'company_info':company_info,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount,'from_date':from_date,'to_date':to_date})
+        if pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            filename = "TrialBalance%s.pdf" %("000")
+            content = "inline; filename='%s'" %(filename)
+            response['Content-Disposition'] = content
+            return response
+        return HttpResponse("Not found")
+    return redirect('Report')
+
+@login_required
+def sale_detail_item_wise(request):
+    pass
