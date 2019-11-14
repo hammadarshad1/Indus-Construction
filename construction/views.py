@@ -831,24 +831,28 @@ def cpv_pdf(request, pk):
 @login_required
 def delete_cash_receiving_voucher(request, pk):
     vc = VoucherHeader.objects.filter(voucherId=pk).delete()
+    tran = Transactions.objects.filter(voucherId=pk).all().delete()
     print("deleted")
     return redirect('Cash-Receiving-Voucher')
 
 @login_required
 def delete_bank_receiving_voucher(request, pk):
     vc = VoucherHeader.objects.filter(voucherId=pk).delete()
+    tran = Transactions.objects.filter(voucherId=pk).all().delete()
     print("deleted")
     return redirect('Bank-Receiving-Voucher')
 
 @login_required
 def delete_cash_payment_voucher(request, pk):
     vc = VoucherHeader.objects.filter(voucherId=pk).delete()
+    tran = Transactions.objects.filter(voucherId=pk).all().delete()
     print("deleted")
     return redirect('Cash-Payment-Vocher')
 
 @login_required
 def delete_bank_payment_voucher(request, pk):
     vc = VoucherHeader.objects.filter(voucherId=pk).delete()
+    tran = Transactions.objects.filter(voucherId=pk).all().delete()
     print("deleted")
     return redirect('Bank-Payment-Voucher')
 
@@ -864,7 +868,28 @@ def view_cash_receiving_voucher(request, pk):
     jv_header = VoucherHeader.objects.filter(voucherId = pk).first()
     jv_detail = VoucherDetail.objects.filter(voucherId = jv_header).all()
     print(jv_header, jv_detail)
-    return render(request, 'construction/view-cash-receiving-voucher.html', {'title':f'View JV{pk}','voucher_header':jv_header,'voucher_detail':jv_detail})
+    return render(request, 'construction/view-cash-receiving-voucher.html', {'title':f'View CRV{pk}','voucher_header':jv_header,'voucher_detail':jv_detail})
+
+@login_required
+def view_bank_receiving_voucher(request, pk):
+    jv_header = VoucherHeader.objects.filter(voucherId = pk).first()
+    jv_detail = VoucherDetail.objects.filter(voucherId = jv_header).all()
+    print(jv_header, jv_detail)
+    return render(request, 'construction/view-bank-receiving-voucher.html', {'title':f'View BRV{pk}','voucher_header':jv_header,'voucher_detail':jv_detail})
+
+@login_required
+def view_cash_payment_voucher(request, pk):
+    jv_header = VoucherHeader.objects.filter(voucherId = pk).first()
+    jv_detail = VoucherDetail.objects.filter(voucherId = jv_header).all()
+    print(jv_header, jv_detail)
+    return render(request, 'construction/view-cash-payment-voucher.html', {'title':f'View CPV{pk}','voucher_header':jv_header,'voucher_detail':jv_detail})
+
+@login_required
+def view_bank_payment_voucher(request, pk):
+    jv_header = VoucherHeader.objects.filter(voucherId = pk).first()
+    jv_detail = VoucherDetail.objects.filter(voucherId = jv_header).all()
+    print(jv_header, jv_detail)
+    return render(request, 'construction/view-bank-payment-voucher.html', {'title':f'View BPV{pk}','voucher_header':jv_header,'voucher_detail':jv_detail})
 
 @login_required
 def report(request):

@@ -47,7 +47,7 @@
             <td><pre>{{ value.description }}</pre></td>
             <td>{{ value.userId.username }}</td>
             <td>
-              <a class="edit_list" href="#" data-toggle=""><i class="fas fa-eye" style="color: #ffcc00;"></i></a>
+              <a class="edit_list" href="{% url 'View-Cash-Payment-Voucher' value.voucherId %}" data-toggle=""><i class="fas fa-eye" style="color: #ffcc00;"></i></a>
               <a data-toggle="modal" href="{%url 'cpv' pk=value.voucherId%}"  class="has_id" id=""><i class="fa fa-print"  id="print_icon" aria-hidden="true"></i></a>
               <a class="delete-jv-summary" href="" data-toggle="modal" data-target="#deleteCpvModal" id="{{value.voucherId}}"><i class="fa fa-trash" style="color:#ff0000;"></i></a>
             </td>
