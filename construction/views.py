@@ -20,7 +20,7 @@ from django.contrib.auth.decorators import login_required
 from decimal import Decimal
 from django.db import transaction
 
-conn = mysql.connector.connect(user='admin', host='localhost', port='3306', password='Gre@ter834', database="Indus")
+conn = mysql.connector.connect(user='root', host='localhost', port='3306', password='', database="Indus")
 
 
 def flush_transaction():
@@ -963,7 +963,66 @@ def sale_summary_item_wise(request):
 
 @login_required
 def account_ledger(request):
-    pass
+     if request.method == "POST":
+         debit_amount = 0
+         credit_amount = 0
+         pk = request.POST.get('account_title')
+         from_date = request.POST.get('from_date')
+         to_date = request.POST.get('to_date')
+         projects = request.POST.get('projects')
+         company_info = CompanyInfo.objects.filter(id=1).all()
+         print("Comna", company_info)
+         cursor = connection.cursor()
+         cursor.execute('''select '' as refrenceid,'' as trantype,'' as date,'' as refinvtranid,
+                        'Opening' as refinvtrantype,'Opening Balance' as remarks,id as accountid_id,
+                        '0' as project_id,'0' as userId_id,
+                        Case When opening_balance > 0 then opening_balance else 0 End as Debit,
+                        Case When opening_balance < 0 then opening_balance else 0 End as Credit
+                        from construction_chartofaccount Where id = %s
+                        Union All
+                        Select * From (
+                        Select refrenceid,trantype,date,refinvtranid,refinvtrantype,
+                        remarks,accountid_id,project_id,userId_id,
+                        Case When amount > 0 then amount else 0 End as Debit,
+                        Case When amount < 0 then amount else 0 End as Credit
+                        from construction_transactions
+                        Where
+                        DATE(date) Between %s And %s
+                        Order by date asc) As tblLedger
+                        Where accountId_id = %s AND project_id = %s ''',[pk,from_date,to_date,pk,projects])
+         row = cursor.fetchall()
+         ledger_list = []
+         balance = 0
+         for i,value in enumerate(row):
+             balance = balance + float(value[9]) + float(value[10])
+             print("here is balance", balance)
+             info = {
+             "date": value[2],
+             "voucher_no": value[3],
+             "tran_type": value[4],
+             "debit":value[9],
+             "credit":value[10],
+             "balance": balance,
+             }
+             ledger_list.append(info)
+         if row:
+            for v in row:
+                if v[9] >= 0:
+                    debit_amount = debit_amount + v[9]
+                if v[10] <= 0:
+                    credit_amount = credit_amount + v[10]
+                    account_id = ChartOfAccount.objects.filter(id = pk).first()
+                    account_title = account_id.account_title
+         id = account_id.id
+         pdf = render_to_pdf('construction/account_ledger_pdf.html',{'ledger_list':ledger_list,'company_info':company_info,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount, 'account_title':account_title, 'from_date':from_date,'to_date':to_date,'id':id})
+         if pdf:
+             response = HttpResponse(pdf, content_type='application/pdf')
+             filename = "TrialBalance%s.pdf" %("000")
+             content = "inline; filename='%s'" %(filename)
+             response['Content-Disposition'] = content
+             return response
+         return HttpResponse("Not found")
+         return redirect('Report')
 
 @login_required
 def trial_balance(request):
