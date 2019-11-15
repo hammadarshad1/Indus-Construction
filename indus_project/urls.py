@@ -28,5 +28,7 @@ urlpatterns = [
     path('password_reset/done/',auth_views.PasswordResetDoneView.as_view(template_name='users/password_reset_done.html'), name='password_reset_done'),
     path('password_reset-confirm/<uidb64>/<token>/',auth_views.PasswordResetConfirmView.as_view(template_name='users/password_reset_confirm.html'), name='password_reset_confirm'),
     path('',include('construction.urls')),
+    path('user_accounts', user_views.user_list, name='user-list'),
+    path('users/delete/<pk>', user_views.delete_user_roles, name='delete-user-roles'),
     # path('inventory/<int:pk>/delete/',InventoryDelete,name='Inventory-Delete'),
 ]

@@ -83,15 +83,15 @@
               {% endfor %}
             </select>
           </div>
-          <div class="form-group col-md-2">
+          <!-- <div class="form-group col-md-2">
             <label for="">Project</label>
             <select class="form-control form-control-sm" id="jv-project_id">
               <option value="">Select Project:</option>
               <!-- {% for value in projects %}
               <option value="{{value.projectId}}">{{value.projectName}}</option>
               {% endfor %} -->
-            </select>
-          </div>
+            <!-- </select> -->
+          <!-- </div> -->
           <div class="form-group col-md-2">
             <input type="text" style="display:none;" class="form-control form-control-sm" value="0" id="check_no">
           </div>
@@ -223,9 +223,9 @@ $("#new-jv-table").on('click','#edit-JV',function(){
       sub_menu = JSON.parse(data.sub_menu);
       $('#jv_project_id').empty()
       $('#jv_project_id').append($("<option></option>").attr("value",3).text("General"));
-      console.log(sub_menu);
       for (var i = 0; i < sub_menu.length; i++) {
           $('#jv_project_id').append($("<option></option>").attr("value",sub_menu[i].pk).text(sub_menu[i].fields["projectName"]));
+          console.log(sub_menu[i].pk);
       }
 
     })
@@ -277,7 +277,7 @@ $("#new-jv-table").on('click','#edit-JV',function(){
                         'transactionId': $("#tran_id").val(),
                         'description': $("#description").val(),
                         'check':$("#check_no").val(),
-                        'project': $("#jv-project_id option:selected").val(),
+                        'project': $("#jv_project_id option:selected").val(),
                         'accountId': $("#jv_customer_title option:selected").val(),
                         'data':JSON.stringify(data),
                     },

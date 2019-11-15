@@ -484,10 +484,16 @@
         <div class="form-row">
           <div class="form-group col-md-12">
             <label for="">Select Account</label>
-            <select class="form-control" name="account_title">
+            <select class="form-control" name="account_title" id='account_title'>
               {% for account in all_accounts %}
               <option value="{{account.id}}">{{account.account_title}}</option>
               {% endfor %}
+            </select>
+          </div>
+          <div class="form-group col-md-12">
+            <label for="">Project</label>
+            <select class="form-control" name="projects" id='projects'>
+
             </select>
           </div>
         </div>
@@ -767,7 +773,7 @@
           <label for="">Select Account</label>
           <select class="form-control" name="account_id">
             {% for value in all_accounts %}
-              <option value="{{value.id}}">{{value.account_title}}</option>
+              <option value="{{value.account_id}}">{{value.account_title}}</option>
             {% endfor %}
           </select>
         </div>
@@ -781,5 +787,48 @@
   </div>
 </div>
 
+<script type="text/javascript">
+
+  function getCookie(c_name)
+  {
+  if (document.cookie.length > 0)
+  {
+    c_start = document.cookie.indexOf(c_name + "=");
+    if (c_start != -1)
+    {
+        c_start = c_start + c_name.length + 1;
+        c_end = document.cookie.indexOf(";", c_start);
+        if (c_end == -1) c_end = document.cookie.length;
+        return unescape(document.cookie.substring(c_start,c_end));
+    }
+  }
+  return "";
+  }
+
+  $("#account_title").on('change', function(){
+    main_object_id = this.value;
+    req =	$.ajax({
+     headers: { "X-CSRFToken": getCookie("csrftoken") },
+     type: 'POST',
+     url : '/transaction/report',
+     data:{
+       'main_object_id':main_object_id ,
+       'samp':"jv",
+     },
+     dataType: 'json'
+    })
+    .done(function done(data) {
+      sub_menu = JSON.parse(data.sub_menu);
+      console.log(sub_menu)
+      $('#projects').empty();
+      $('#projects').append($("<option></option>").attr("value",3).text("General"));
+      for (var i = 0; i < sub_menu.length; i++) {
+          $('#projects').append($("<option></option>").attr("value",sub_menu[i].pk).text(sub_menu[i].fields["projectName"]));
+          console.log(sub_menu[i].pk);
+      }
+
+    })
+  });
+</script>
 
 {% endblock %}

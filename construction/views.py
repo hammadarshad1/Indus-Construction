@@ -366,6 +366,7 @@ def journal_voucher_new(request):
         project_id = request.POST.get('project', False)
         accountId = request.POST.get('accountId', False)
         data = json.loads(request.POST.get('data', False))
+        print(project_id)
         date = datetime.date.today()
         project_id = Project.objects.get(projectId = project_id)
         account_id = ChartOfAccount.objects.get(id = accountId)
@@ -787,7 +788,7 @@ def purchase_new(request):
             p = PurchaseHeader(purchaseNo=get_last_purchase_no, payment_method=payMethod, details="", tax=0.00, accountId= ChartOfAccount.objects.get(account_title=client), userId=request.user, projectId=Project.objects.get(projectId=project))
             p.save()
 
-
+            # c = ChartOfAccount.objects.
             # print()
             print(items)
             for item in items:
@@ -798,6 +799,17 @@ def purchase_new(request):
                 ST = item['ST']
                 s = PurchaseDetail(purchaseQuantity=Qty,purchasePrice=Price,total=((int(Qty)*int(Price))+(int(Price)*(int(ST)/100))),itemId=Inventory.objects.get(itemId=itemCode),purchaseHeaderId=PurchaseHeader.objects.get(purchaseNo=get_last_purchase_no))
                 s.save()
+                if payment_method == 'Cash':
+                    tran2 = Transactions(refrenceId = 0, refrenceDate = datetime.date.today, accountId = ChartOfAccount.objects.get(account_id=client), tranType = "Purchase Invoice", amount = total_amount, date = date, remarks = purchase_id,ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
+                    tran2.save()
+                    tran1 = Transactions(refrenceId = 0, refrenceDate = datetime.date.today, accountId = itemCode, tranType = "Purchase Invoice", amount = -abs(total_amount), date = date, remarks = purchase_id,ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
+                    tran1.save()
+                else:
+                    purchase_account = ChartOfAccount.objects.get(account_title = 'Purchases')
+                    tran1 = Transactions(refrenceId = 0, refrenceDate = datetime.date.today, accountId = account_id, tran_type = "Purchase Invoice", amount = -abs(total_amount), date = date, remarks = purchase_id,ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
+                    tran1.save()
+                    tran2 = Transactions(refrenceId = 0, refrenceDate = datetime.date.today, accountId = purchase_account, tran_type = "Purchase Invoice", amount = total_amount, date = date, remarks = purchase_id,ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
+                    tran2.save()
                 print('Added')
                 return JsonResponse({'success':'success'})
 
@@ -894,6 +906,12 @@ def view_bank_payment_voucher(request, pk):
 @login_required
 def report(request):
     all_accounts = ChartOfAccount.objects.all()
+    if request.method == "POST":
+        if request.POST.get('samp') == 'jv':
+            main_object_id = request.POST.get('main_object_id')
+            sub_menu = Project.objects.filter(accountId=main_object_id).all()
+            sub_menu = serializers.serialize('json',sub_menu)
+            return JsonResponse({'sub_menu':sub_menu})
     return render(request, 'construction/reports.html', {'title':'Reports','all_accounts':all_accounts})
 
 @login_required
@@ -960,9 +978,10 @@ def trial_balance(request):
         cursor.execute('''Select id,account_title,ifnull(amount,0) + opening_balance As Amount
                         from construction_chartofaccount
                         Left Join
-                        (select accountId_id,sum(Amount) As Amount from construction_transactions
-                        Where construction_transactions.date Between %s And %s
-                        Group By accountId_id) As tbltran On construction_chartofaccount.id = tbltran.accountId_id
+                        (select accountId_id,sum(amount) As Amount from construction_transactions
+                        Where construction_transactions.refrenceDate Between %s And %s
+                        Group By accountId_id
+                        ) As tbltran On construction_chartofaccount.id = tbltran.accountId_id;
                         ''',[from_date, to_date])
                         # 'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser
         row = cursor.fetchall()

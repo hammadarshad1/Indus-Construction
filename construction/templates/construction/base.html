@@ -17,9 +17,9 @@
   {% endif %}
   <!-- Custom fonts for this template-->
   <link href="{% static 'construction/css/all.min.css' %}" rel="stylesheet" type="text/css">
-  <link href="{% static 'construction/css/dataTables.bootstrap4.css' %}" rel="stylesheet">
+  <!-- <link href="{% static 'construction/css/dataTables.bootstrap4.css' %}" rel="stylesheet">
   <script src="{% static 'construction/js/jquery.dataTables.js' %}"></script>
-  <script src="{% static 'construction/js/dataTables.bootstrap4.js' %}"></script>
+  <script src="{% static 'construction/js/dataTables.bootstrap4.js' %}"></script> -->
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
@@ -177,7 +177,7 @@
               <!-- <h6 class="dropdown-header">Login Screens:</h6> -->
               <!-- <a class="dropdown-item" href="login.html">Login</a>
               <a class="dropdown-item" href="register.html">Register</a> -->
-              <a class="dropdown-item" href="{% url 'Purchase' %}">Purchase</a>
+              <!-- <a class="dropdown-item" href="{% url 'Purchase' %}">Purchase</a> -->
               <h5 class="dropdown-header">Vouchers :</h5>
               <a class="dropdown-item" href="{% url 'Journal-Voucher' %}">Journal Voucher</a>
               <h5 class="dropdown-header">Receiving :</h5>
@@ -204,7 +204,7 @@
           <span>Setup</span>
         </a>
         <div class="dropdown-menu" aria-labelledby="pagesDropdown">
-          <a class="dropdown-item" href="#">User's Account</a>
+          <a class="dropdown-item" href="{% url 'user-list' %}">User's Account</a>
         </div>
       </li>
 

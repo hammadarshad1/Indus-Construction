@@ -1,0 +1,155 @@
+{% extends "construction/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Users</h4>
+</div>
+<ul class="list-group list-group-flush">
+  <li class="list-group-item">
+    <div class="input-group">
+      <div class="col-md-12">
+          <a role="button" href="{% url 'Register' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
+      </div>
+    </div>
+    <br>
+    <div class="table table-responsive">
+      <table class="table table-bordered sort" id="dataTable-user">
+          <thead>
+              <tr>
+                  <th width="60px">S NO.</th>
+                  <th width="150px">First Name</th>
+                  <th width="150px">Last Name</th>
+                  <th width="150px">User Name</th>
+                  <th width="150px">Email</th>
+                  <th width="150px">Status</th>
+                  <th width="100px">Date Joined</th>
+                  <th style="display:none;">id</th>
+                  <td>Action</td>
+              </tr>
+          </thead>
+          <tbody>
+            {% for row in all_user %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ row.first_name }}</td>
+                <td>{{row.last_name}}</td>
+                <td>{{ row.username }}</td>
+                <td>{{ row.email }}</td>
+                {% if row.is_active == 1 %}
+                  <td>Active</td>
+                {% else %}
+                  <td>Deactive</td>
+                {% endif %}
+                <td>{{ row.date_joined }}</td>
+                <td style="display:none;">{{ row.id }}</td>
+                <td width='100px'>
+                      <a class="edit_list" href="#" data-toggle="modal" data-target="#updateUserModal"><i class="fas fa-pencil-alt" style="color:#e6e600;"></i></a>
+
+                      <a class="delete" href="#"><i class="fas fa-tasks"></i></a>
+
+                      <a class="return" href="{% url 'password_reset' %}" data-toggle=""><i class="fas fa-undo"></i></a>
+
+                      <a class="delete-user" href="#" data-toggle="modal" data-target="#deleteUserModal" id="{{row.id}}" data-toggle="tooltip"><i class="fa fa-trash" style="color:red;"></i></a>
+                </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+      </table>
+    </div>
+  </li>
+</ul>
+</div>
+
+<!-- Delete Modal-->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Delete Account</h5>
+        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">Are you sure you want to delete?</div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <a class="btn btn-danger" href="" id="modal_delete_button">Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- Modal -->
+
+  <!-- Modal -->
+
+  <div class="modal fade" id="updateUserModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+
+              <!-- Modal Header -->
+              <div class="modal-header">
+                <h4 class="modal-title">Update User</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+              </div>
+
+              <!-- Modal body -->
+              <form action="{% url 'user-list' %}" method="POST"  autocomplete="off">
+                  {% csrf_token %}
+                   <div class="modal-body">
+                       <div class="form-row">
+                           <div class="form-group col-md-12">
+                             <input type='text' style='display:none;' class="form-control form-control-sm" name='userIdUpdate' id='userIdUpdate'>
+                             <label for="">First Name</label>
+                             <input type="text"  class="form-control form-control-sm" id="firstName" name="firstName">
+                           </div>
+                           <div class="form-group col-md-12">
+                             <label for="">Last Name</label>
+                             <input type="text"  class="form-control form-control-sm" id="lastName" name="lastName">
+                           </div>
+                           <div class="form-group col-md-12">
+                             <label for="">User Name</label>
+                             <input type="text"  class="form-control form-control-sm" id="userName" name="userName">
+                           </div>
+                           <div class="form-group col-md-12">
+                             <label for="">Email</label>
+                             <input type="text"  class="form-control form-control-sm" id="email" name="email">
+                           </div>
+                        </div>
+                   </div>
+                 <!-- Modal footer -->
+                 <div class="modal-footer">
+                   <input type="submit" class="btn btn-success" value="Submit" id='submitUser'>
+                 </div>
+               </form>
+
+            <!-- <form class="" action="index.html" method="post">
+            </form> -->
+        </div>
+      </div>
+  </div>
+
+<script type="text/javascript">
+  $(".delete-user").on('click',function(){
+   $("#modal_delete_button").attr("href", `users/delete/${this.id}`);
+ })
+
+ $("#dataTable-user tbody").on('click','.edit_list', function(){
+     var tr = $(this).closest('tr');
+     var firstName = tr.find('td:eq(1)').text();
+     var lastName = tr.find('td:eq(2)').text();
+     var userName = tr.find('td:eq(3)').text();
+     var email = tr.find('td:eq(4)').text();
+     var id = tr.find('td:eq(7)').text();
+     console.log(firstName, lastName, userName, email);
+     $("#firstName").val(firstName);
+     $('#userIdUpdate').val(id);
+     $("#lastName").val(lastName);
+     $('#userName').val(userName);
+     $('#email').val(email);
+ })
+
+</script>
+
+{% endblock %}
