@@ -74,7 +74,7 @@
       <table cellpadding="3" id="item_table" repeat="1">
           <thead>
             <tr class="heading_row">
-              <th align="center" style="width: 200px;"><font size="13px">ACCOUNT CODE</font></th>
+              <th align="center" style="width: 50px;"><font size="13px">ID</font></th>
               <th style="width:700px;"><font size="13px">D  E  S  C  R  I  P  T  I  O  N</font></th>
               <th style="width:200px;"><font size="13px">Dr.</font></th>
               <th style="width:200px;"><font size="13px">Cr.</font></th>
@@ -93,9 +93,9 @@
             {% endfor %}
           <tr class="heading_row">
             <td style="width: 200px;"></td>
-            <td style="width:900px; text-align: right;"><font size="13px"> T O T A L </font></td>
-            <td  style="text-align:center; width:200px; text-align: right" ><font size="14px">{{debit.debit__sum|floatformat:2|abs}}</font></td>
-            <td  style="text-align:center; width:200px; text-align: right" ><font size="14px">{{credit.credit__sum|floatformat:2|abs}}</font></td>
+            <td style="width:900px; text-align: right;"><font size="13px"><b> T O T A L </b></font></td>
+            <td  style="text-align:center; width:200px; text-align: right" ><font size="14px"><b>{{debit.debit__sum|floatformat:2|abs}}</b></font></td>
+            <td  style="text-align:center; width:200px; text-align: right" ><font size="14px"><b>{{credit.credit__sum|floatformat:2|abs}}</b></font></td>
           </tr>
         </tbody>
       </table>

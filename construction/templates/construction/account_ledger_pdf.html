@@ -40,8 +40,8 @@
          {% for value in company_info %}
          <h1 style="text-align:center; font-size:400%; font-family: "Times New Roman", Times, serif; " color="#0a012c" ><b>{{value.companyName}}</b></h1>
          {% endfor %}
-         <p style="text-align:center; padding-top:-60px ;font-size:200%; font-family: "Times New Roman", Times, serif; " color="#0a012c"  >Account Ledger</p>
-         <p style="text-align:center; padding-top:-20px ;font-size:150%; font-family: "Times New Roman", Times, serif; " color="#0a012c">From: {{from_date}}    To: {{to_date}}</p>
+         <p style="text-align:center; padding-top:-60px ; font-family: "Times New Roman", Times, serif; " color="#0a012c"  ><font size="14px">Account Ledger</font></p>
+         <p style="text-align:center; font-size:150%; padding-top:-20px ; font-family: "Times New Roman", Times, serif; " color="#0a012c">From: <b>{{from_date}}</b>    To: <b>{{to_date}}</b></p>
      </div>
     </div>
 <!-- Content for Static Frame 'footer_frame' -->
@@ -72,10 +72,10 @@
           <tr class="heading_row">
             <th align="center" style="width: 150px;"><font size="14px">Date</font></th>
             <th style="width:300px;"><font size="14px">Voucher</font></th>
-            <th style="width:500px;"><font size="14px">Particular</font></th>
-            <th style="width:200px;"><font size="14px">Debit</font></th>
-            <th style="width:200px;"><font size="14px">Credit</font></th>
-            <th style="width:200px;"><font size="14px">Balance</font></th>
+            <th style="width:600px;"><font size="14px">Particular</font></th>
+            <th style="width:150px;text-align: right;"><font size="14px">Debit</font></th>
+            <th style="width:150px;text-align: right;"><font size="14px">Credit</font></th>
+            <th style="width:150px;text-align: right;"><font size="14px">Balance</font></th>
           </tr>
         </thead>
         <tbody>
@@ -84,26 +84,26 @@
           {% if value.tran_type == "Opening" %}
             <td style="width: 150px; height:30px;"></td>
             <td style="width: 300px;"></td>
-            <td style="width: 500px; text-align:center;"><font size="12px">Balance B/F</font></td>
+            <td style="width: 500px; text-align:left;"><font size="12px">Balance B/F</font></td>
           {% else %}
             <td style="width: 150px; height:30px;"><font size="12px">{{value.date}}</font></td>
             <td style="width: 300px;"><font size="12px">{{value.tran_type}} {{value.voucher_no}}</font></td>
-            <td style="width: 500px; text-align:center;"><font size="12px">Invoice No: {{value.voucher_no}} / Refrence Date: {{value.date}}</font></td>
+            <td style="width: 600px; text-align:center;"><font size="12px">Invoice No: {{value.voucher_no}} / Refrence Date: {{value.date}}</font></td>
           {% endif %}
-          <td style="width: 200px; text-align:center;"><font size="12px">{{value.debit|abs|floatformat:2}}</font></td>
-          <td style="width: 200px; text-align:center;"><font size="12px">{{value.credit|abs|floatformat:2}}</font></td>
-          <td style="width: 200px; text-align:center;"><font size="12px"></font>{{value.balance|abs|floatformat:2}}</td>
+          <td style="width: 150px; text-align:right;"><font size="12px">{{value.debit|abs|floatformat:2}}</font></td>
+          <td style="width: 150px; text-align:right;"><font size="12px">{{value.credit|abs|floatformat:2}}</font></td>
+          <td style="width: 150px; text-align:right;"><font size="12px">{{value.balance|abs|floatformat:2}}</font></td>
       </tr>
       {% endfor %}
       <tr class="">
       <td style="width: 150px; height:30px;"></td>
       <td style="width:700px; text-align:center;" colspan="2"><font size="14px"> <b>Grand Total</b> </font></td>
-      <td style="text-align:center;"><font size="12px"><b>{{debit_amount|abs|floatformat:2}} </b></font></td>
-      <td style="text-align:center;"><font size="12px"><b>{{credit_amount|abs|floatformat:2}}</b></font></td>
+      <td style="text-align:right;"><font size="12px"><b>{{debit_amount|abs|floatformat:2}} </b></font></td>
+      <td style="text-align:right;"><font size="12px"><b>{{credit_amount|abs|floatformat:2}}</b></font></td>
       {% if debit_amount|add:credit_amount|floatformat:2|length < 0 %}
-        <td style="width: 200px; text-align:center;"><font size="12px"><b>{{debit_amount|add:credit_amount|abs|floatformat:2}} Dr.</b></font></td>
+        <td style="width: 200px; text-align:right;"><font size="12px"><b>{{debit_amount|add:credit_amount|abs|floatformat:2}} Dr.</b></font></td>
       {% else %}
-        <td style="width: 200px; text-align:center;"><font size="12px"><b>{{debit_amount|add:credit_amount|abs|floatformat:2}} Cr.</b></font></td>
+        <td style="width: 200px; text-align:right;"><font size="12px"><b>{{debit_amount|add:credit_amount|abs|floatformat:2}} Cr.</b></font></td>
       {% endif %}
       </tr>
       </tbody>

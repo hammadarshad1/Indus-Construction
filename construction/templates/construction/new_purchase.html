@@ -1,0 +1,390 @@
+{% extends "construction/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Purchase Invoice</h4>
+</div>
+<ul class="list-group list-group-flush">
+<form  action="" id="new-sale-submit" autocomplete="off" method="post">
+  {% csrf_token %}
+  <li class="list-group-item">
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label for="">Pruchase ID</label>
+          <input type="text" readonly class="form-control form-control-sm" required value="{{ get_last_tran_id }}" id="sale_id">
+        </div>
+        <div class="form-group col-md-2">
+          <label>Customer Name</label>
+          <select class="form-control form-control-sm" id="customer_name_sale">
+              <option value="">Select Account:</option>
+            {% for value in all_accounts %}
+            <option value="{{value.account_title}}">{{value.account_title}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group col-md-2">
+            <label>Project</label>
+            <select class="form-control form-control-sm" id="project_sale">
+                <option value="">Select Project:</option>
+            </select>
+          </div>
+        <div class="form-group col-md-2">
+          <label for="">Date</label>
+          <input type="date"  class="form-control form-control-sm" id="date" required>
+        </div>
+        <div class="form-group col-md-2">
+         <label for="sel1">Payment Term:</label>
+         <select class="form-control form-control-sm" id="payment_method">
+           <option>Cash</option>
+           <option>Credit</option>
+         </select>
+        </div>
+        <!-- <div class="form-group col-md-2">
+          <label for="">Credit Days:</label>
+          <input type="text" readonly class="form-control form-control-sm" value="" id="credit_days">
+        </div> -->
+        <!-- <div class="form-group col-md-2">
+          <label for="">Follow Up</label>
+          <input type="date"  class="form-control form-control-sm"   id="follow_up">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">HS Code</label>
+          <input type="text"  class="form-control form-control-sm"   id="hs_code">
+        </div> -->
+        <div class="form-group">
+          <label for="exampleFormControlTextarea2">Description</label>
+          <textarea class="form-control rounded-0" rows="3" id="footer_desc"></textarea>
+        </div>
+      </div>
+    </li>
+    <li class="list-group-item">
+    <div class="table-title">
+        <div class="row">
+          <!-- <div class="form-group col-md-3">
+            <input type="text" list="item" placeholder="Enter Item Code here..." class="form-control form-control-sm" id="item_code_sale">
+          </div>
+          <datalist id="item">
+            {% for value in dc_detail %}
+            <option value="{{value.1}}">{{value.1}} | {{value.2}} | {{value.3}}</option>
+            {% endfor %}
+          </datalist>
+            <div style="margin-left:20px;">
+                <button type="button" class="btn btn-info add-item-sale"><i class="fa fa-plus"></i>Insert Item</button>
+            </div> -->
+            <!-- <div class="form-group col-md-3">
+              <input type="text" list="dc" placeholder="Enter Dc No here..." class="form-control form-control-sm" id="dc_code_sale">
+            </div> -->
+            <!-- <div class="form-group col-md-3">
+              <input list="account" id="dc_code_sale" placeholder="Enter Dc No here..." class="form-control form-control-sm" required >
+              <datalist id="account">
+
+            </datalist>
+            </div>
+            <datalist id="dc">
+            </datalist>
+              <div style="margin-left:20px;">
+                  <button type="button" class="btn btn-info add-item-sale"><i class="fa fa-plus"></i>Insert Delivery Challan</button>
+              </div> -->
+        </div>
+    </div>
+    <div class="table table-responsive">
+      <table class="table table-bordered" id="new-purchase-table">
+          <thead>
+              <tr>
+                  <th width="50px">S No.</th>
+                  <th width="100px">Item Name</th>
+                  <th width="200px">Category</th>
+                  <th width="100px">Quantity</th>
+                  <th width="100px">Unit</th>
+                  <th width="150px">Price</th>
+                  <th width="100px">VOG</th>
+                  <th width="90px">ST in % </th>
+                  <th width="110px">ST Amount</th>
+                  <th width="90px">Total</th>
+                  <th>Action</th>
+              </tr>
+          </thead>
+          <tbody>
+            <td></td>
+            <td><input type="text" id="" style="width: 150px;"></td>
+            <td><select class="form-control form-control-sm" id="jv_customer_title">
+                <option value="">Select Account:</option>
+                {% for inventory in inv %}
+                <option value="{{inventory.itemId}}">{{inventory.itemName}}</option>
+                {% endfor %}
+              </select></td>
+            <td><input type="text" id="" style="width: 100px;"></td>
+            <td><input type="text" id="" style="width: 100px;"></td>
+            <td><input type="text" id="" style="width: 100px;"></td>
+            <td><input type="text" id="" style="width: 100px;" disabled></td>
+            <td>17%</td>
+            <td><input type="text" id="" style="width: 100px;" disabled value="0.00"></td>
+            <td><input type="text" id="" style="width: 100px;" disabled value="0.00"></td>
+            <td><a id='edit-PUR' hidden='hidden'><button class='btn' type='button'><i class='fas fa-pencil-alt' style='color:#e6e600;'></i></button></a><a id='add-PUR'><button class='btn' type='button'><i class='fas fa-plus' style='color:#00b300;'></i></button></a><a id='delete-PUR'><button class='btn' type='button'><i class='fa fa-trash' style='color:#ff0000;'></i></button></a></td>
+          </tbody>
+      </table>
+    </div>
+    </li>
+    <br>
+      <input type="hidden" name="" value="" id="hidden">
+      <div class="row">
+        <div class="col-md-6">
+          <!-- <div class="col-md-6" style="margin-left:-120px;">
+            <div>
+                <button type="button" class="btn btn-info add-cartage"><i class="fa fa-plus"></i>Insert Cartage</button>
+            </div>
+          </div> -->
+          <br>
+          <br>
+          <table id="cartage-table">
+            <thead>
+              <th style="width:150px;"></th>
+              <th style="width:150px;"></th>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-md-6">
+            <br>
+            <div class="col-md-6" style="margin-left:200px;">
+              <div class="form-inline">
+                <div class="form-group">
+                  <label for="text" style="font-size:14px;">Additional Tax: &nbsp;&nbsp;&nbsp;</label>
+                  <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="additional_tax" required value="0.00">
+                </div>
+              </div>
+              <div class="form-inline">
+                <div class="form-group">
+                  <label for="text" style="font-size:14px;">Sales Tax:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                  <input type="text" readonly class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="total_sales_tax" required value="0.00">
+                </div>
+              </div>
+              <div class="form-inline">
+                <div class="form-group">
+                  <label for="text" style="font-size:14px;"><b>Grand Total:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                  <input type="text" readonly class="form-control form-control-sm" id="last_grand_total" style="border-top: 0px; border-right:0px; border-left:0px;">
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+    <div class="text-center">
+      <button type="submit" class="btn btn-outline-primary">Submit <small>(Sale)</small></button>
+    </div>
+    <br>
+</form>
+</ul>
+</div>
+
+<script type="text/javascript">
+
+  function getCookie(c_name)
+  {
+  if (document.cookie.length > 0)
+  {
+    c_start = document.cookie.indexOf(c_name + "=");
+    if (c_start != -1)
+    {
+        c_start = c_start + c_name.length + 1;
+        c_end = document.cookie.indexOf(";", c_start);
+        if (c_end == -1) c_end = document.cookie.length;
+        return unescape(document.cookie.substring(c_start,c_end));
+    }
+  }
+  return "";
+  }
+
+  req =	$.ajax({
+   headers: { "X-CSRFToken": getCookie("csrftoken") },
+   type: 'POST',
+   url : '/transaction/purchase/new/',
+   data:{
+     'samp':"sale_new",
+   },
+   dataType: 'json'
+  })
+  .done(function done(data) {
+    sub_menu = JSON.parse(data.sub_menu);
+    console.log(sub_menu)
+    // $('#dc_code_sale').empty();
+    // $('#dc_code_sale').append($("<option></option>").attr("value",3).text("General"));
+    for (var i = 0; i < sub_menu.length; i++) {
+        console.log(sub_menu);
+        $('#account').append($("<option></option>").attr("value",sub_menu[i].fields['docNo']).text(sub_menu[i].fields["voucherNo"]));
+        console.log(sub_menu[i].pk);
+    }
+
+  })
+
+  $('#new-purchase-table').on('click', '#delete-PUR', function(){
+  var tr = $(this).closest('tr');
+  tr.remove();
+});
+
+$('#new-purchase-table').on('click','#add-PUR ',function(){
+  var tr = $(this).closest('tr');
+  var itemNameTd = tr.find('td:eq(1)');
+  var categoryTd = tr.find('td:eq(2)');
+  var quantityTd = tr.find('td:eq(3)');
+  var unitTd = tr.find('td:eq(4)');
+  var priceTd = tr.find('td:eq(5)');
+  var vogTd = tr.find('td:eq(6)');
+  vogInput = vogTd.find('input');
+  var plus_button = tr.find('td:eq(10)');
+  var st = tr.find('td:eq(8)');
+  var total = tr.find('td:eq(9)');
+  total = total.find('input');
+  st = st.find('input');
+  plus = plus_button.find('#add-PUR');
+  plus.attr('hidden','true');
+  pencil_button = plus_button.find('#edit-PUR');
+  // console.log(pencil_button)
+  pencil_button.removeAttr('hidden');
+  itemNameInput = itemNameTd.find('input');
+  itemNameInput.attr('disabled','disabled');
+  categoryInput = categoryTd.find('input');
+  categoryInput.attr('disabled','disabled');
+  quantityInput = quantityTd.find('input');
+  quantityInput.attr('disabled','disabled');
+  unitInput = unitTd.find('input');
+  unitInput.attr('disabled','disabled');
+  priceInput = priceTd.find('input');
+  priceInput.attr('disabled','disabled');
+  vogInput.val(priceInput.val()*unitInput.val())
+  st.val(vogInput.val()*(17/100));
+  total.val(parseInt(vogInput.val())+parseInt(st.val()));
+});
+
+
+$('#new-purchase-table').on('click','#edit-PUR ',function(){
+  var tr = $(this).closest('tr');
+  var itemNameTd = tr.find('td:eq(1)');
+  var categoryTd = tr.find('td:eq(2)');
+  var quantityTd = tr.find('td:eq(3)');
+  var unitTd = tr.find('td:eq(4)');
+  var priceTd = tr.find('td:eq(5)');
+  var vogTd = tr.find('td:eq(6)');
+  var plus_button = tr.find('td:eq(10)');
+
+  plus = plus_button.find('#add-PUR');
+  plus.attr('hidden','true');
+  pencil_button = plus_button.find('#add-PUR');
+  console.log(pencil_button)
+  pencil_button.removeAttr('hidden');
+  itemNameInput = itemNameTd.find('input');
+  itemNameInput.removeAttr('disabled');
+  categoryInput = categoryTd.find('input');
+  categoryInput.removeAttr('disabled');
+  quantityInput = quantityTd.find('input');
+  quantityInput.removeAttr('disabled');
+  unitInput = unitTd.find('input');
+  unitInput.removeAttr('disabled');
+  priceInput = priceTd.find('input');
+  priceInput.removeAttr('disabled');
+  vogInput = vogTd.find('input');
+  vogInput.removeAttr('disabled');
+  pencil_button = plus_button.find('#edit-PUR');
+  pencil_button.attr('hidden','hidden');
+
+});
+
+
+$("#new-sale-submit").on('submit',function(e){
+                  e.preventDefault(e);
+                    var table = $('#new-purchase-table');
+                    var data = [];
+
+                    table.find('tr').each(function (i, el){
+                        if(i != 0)
+                        {
+                            var $tds = $(this).find('td');
+                            var row = {
+                                'ItemName':'',
+                                'ItemCategory' : "",
+                                'Quantity':"",
+                                'Unit':"",
+                                'Price':"",
+                            };
+                            $tds.each(function(i, el){
+                                if(i == 1){
+                                    row['ItemName'] = ($(this).find('input')).val();
+                                }
+                                else if (i == 2){
+                                    row['ItemCategory'] = ($(this).find('select option:selected')).val()
+                                }
+                                else if (i == 3){
+                                    row["Quantity"] = ($(this).find('input')).val();
+                                }
+                                else if (i == 4){
+                                    row["Unit"] = ($(this).find('input')).val();
+                                }
+                                else if (i == 5){
+                                    row["Price"] = ($(this).find('input')).val();
+                                }
+
+                            });
+                            data.push(row);
+                            console.log(data);
+                        }
+
+
+                    });
+
+                    req =   $.ajax({
+                                headers: { "X-CSRFToken": getCookie("csrftoken") },
+                                type: 'POST',
+                                url : '/transaction/purchase/new/',
+                                data:{
+                                    'purchaseId': $("#sale_id").val(),
+                                    'samp':'purchaseSubmit',
+                                    'customerName': $("#customer_name_sale option:selected").text(),
+                                    'date': $("#date").val(),
+                                    'payMethod': $("#payment_method option:selected").val(),
+                                    'Project':$("#project_sale option:selected").val(),
+                                    'Description':$("#footer_desc").val(),
+                                    'items': JSON.stringify(data)
+                                },
+                                dataType: 'json'
+                            })
+                    .done(function done(data){
+                        location.reload();
+                    })
+                });
+
+  $("#customer_name_sale").on('change', function(){
+    main_object_id = this.value;
+    req =	$.ajax({
+     headers: { "X-CSRFToken": getCookie("csrftoken") },
+     type: 'POST',
+     url : '/transaction/purchase/new/',
+     data:{
+       'main_object_id':main_object_id ,
+       'samp':"purchaseProject",
+     },
+     dataType: 'json'
+    })
+    .done(function done(data) {
+      sub_menu = JSON.parse(data.sub_menu);
+      $('#project_sale').empty()
+      $('#project_sale').append($("<option></option>").attr("value",3).text("General"));
+      console.log(sub_menu);
+      for (var i = 0; i < sub_menu.length; i++) {
+          $('#project_sale').append($("<option></option>").attr("value",sub_menu[i].pk).text(sub_menu[i].fields["projectName"]));
+      }
+
+    })
+  });
+
+</script>
+
+{% endblock %}

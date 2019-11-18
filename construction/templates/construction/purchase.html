@@ -1,11 +1,14 @@
-{% extends 'construction/base.html' %}
+{% extends "construction/base.html" %}
+{% load crispy_forms_tags %}
 {% block content %}
-  <div class="card" style="width: 100%;">
-  <div class="card-header">
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
   <h4>Purchases</h4>
-  </div>
-  <ul class="list-group list-group-flush">
+</div>
+<ul class="list-group list-group-flush">
   <li class="list-group-item">
+    <br>
     <ul style="list-style-type:none;" class="messages">
       {% if messages %}
         {% for msg in messages %}
@@ -17,9 +20,15 @@
         {% endfor %}
       {% endif %}
     </ul>
+    <!-- <div class="form-row">
+      <input type="text" name=""class="form-control col-md-2" value="">
+    </div> -->
     <div class="input-group">
       <div class="col-md-12">
-          <a role="button" href="{% url 'Purchase-New' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
+            <a role="button" href="{% url 'new-purchase' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
+            <!-- <a role="button" href="{# url 'new-sale-ngst' #}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
+        <a role="button" href="{# url 'new-sale-ngst' #}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
+        <a role="button" href="{# url 'new-sale-ngst' #}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a> -->
       </div>
     </div>
     <br>
@@ -29,23 +38,43 @@
               <tr>
                   <th width="140px">Purchase ID</th>
                   <th >Date</th>
-                  <th >Supplier</th>
+                  <th >Customer</th>
                   <th >From</th>
-                  <th width="400px">Action</th>
+                  <th >Action</th>
               </tr>
           </thead>
           <tbody>
-            {% for value in all_purchases reversed %}
+            {% for value in all_sales reversed %}
             <tr>
-                <td>{{ value.purchase_no }}</td>
+                <td>{{ value.sale_no }}</td>
                 <td>{{ value.date }}</td>
                 <td>{{ value.account_id.account_title }}</td>
-                <td>{{value.user_id.username}}</td>
+                <td>{{ value.user_id.username }}</td>
                 <td>
-                      <a class="edit_list" href="{% url 'edit-purchase' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
-                      <a class="edit_list" href="{% url 'edit-purchase-ngst' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
-                  <a href="#" data-toggle=""><i class="fas fa-undo"></i></a>
-                  <a class="delete_purchase"  href="" data-toggle="modal" data-target="#deletePurchaseModal" id="{{value.id}}"><i class="material-icons">&#xE872;</i></a>
+
+                  {% if permission.edit == 1 %}
+                    {% if gst.company_type == 1 %}
+                      <a class="edit_list" href="{% url 'edit-sale' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
+                    {% else %}
+                      <a class="edit_list" href="{% url 'edit-sale-ngst' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
+                    {% endif %}
+                  {% endif %}
+
+                  {% if permission.r_print == 1 %}
+                  {% if gst.company_type == 1 %}
+                    <a data-toggle="modal" href="#"  class="has_id" id="{{value.id}}" data-target="#invoiceType"><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a>
+                  {% else %}
+                    <a href="{% url 'commercial-invoice-ngst' pk=value.id %}" target="_blank"  class="has_id" id="{{value.id}}" ><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a>
+                  {% endif %}
+                  {% endif %}
+
+                  {% if permission.r_return == 1 %}
+                  <a class="return" href="{% url 'new-sale-return' pk=value.id %}" data-toggle=""><i class="fas fa-undo"></i></a>
+                  {% endif %}
+
+                  {% if permission.delete == 1 %}
+                  <a class="delete" href="" data-toggle="modal" data-target="#deleteSaleModal" id="{{value.id}}"><i class="material-icons">&#xE872;</i></a>
+                  {% endif %}
                 </td>
             </tr>
             {% endfor %}
@@ -53,15 +82,43 @@
       </table>
     </div>
   </li>
-  </ul>
-  </div>
+</ul>
+</div>
 
-  <!-- Delete Modal-->
-  <div class="modal fade" id="deletePurchaseModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+<!-- Invoices Modal -->
+<div class="modal fade" id="invoiceType" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Invoice Type</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6 col-sm-12">
+            <a type="button" id="sales_tax_invoice" href="" class="btn btn-info">Sales Tax Invoice</a>
+          </div>
+          <div class="col-md-6 col-sm-12">
+              <a type="button" id="commercial_invoice" href="" class="btn btn-info">Commercial Invoice</a>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Modal-->
+<div class="modal fade" id="deleteSaleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Delete Purchase Invoice</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Delete Sale Invoice</h5>
         <button class="close" type="button" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">×</span>
         </button>
@@ -73,6 +130,9 @@
       </div>
     </div>
   </div>
-  </div>
+</div>
   <!-- Modal -->
+
+
+
 {% endblock %}

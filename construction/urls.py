@@ -5,7 +5,7 @@ delete_inventory_category, delete_inventory, delete_chartofaccount,
  bank_receiving_voucher, bank_receiving_voucher_new, edit_chart_of_account, delete_chart_of_account, cash_payment_voucher,
  cash_payment_voucher_new, bank_payment_voucher, bank_payment_voucher_new, delete_journal_voucher,jv_pdf,crv_pdf, purchase, purchase_new, brv_pdf,
  cpv_pdf, bpv_pdf, delete_cash_receiving_voucher, delete_bank_receiving_voucher, delete_cash_payment_voucher, delete_bank_payment_voucher, view_journal_voucher, view_cash_receiving_voucher,
- report, sale_summary_item_wise, account_ledger, trial_balance, sale_detail_item_wise, view_bank_receiving_voucher, view_cash_payment_voucher, view_bank_payment_voucher)
+ report, sale_summary_item_wise, account_ledger, trial_balance, sale_detail_item_wise, view_bank_receiving_voucher, view_cash_payment_voucher, view_bank_payment_voucher, purchase, new_purchase)
 
 urlpatterns = [
     path('', home, name='Home'),
@@ -53,4 +53,6 @@ urlpatterns = [
     path('account_ledger/pdf/', account_ledger, name = 'account-ledger'),
     path('trial_balance/pdf/', trial_balance, name = 'trial-balance'),
     path('sale_detail_item_wise/pdf/', sale_detail_item_wise, name = 'sale-detail-item-wise'),
+    path('transaction/purchase/', purchase, name = 'purchase'),
+    path('transaction/purchase/new/', new_purchase, name = 'new-purchase'),
 ]

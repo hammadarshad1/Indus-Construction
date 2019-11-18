@@ -81,8 +81,8 @@
         <tr class="heading_row">
           <th align="center" style="width: 150px;"><font size="14px">Acc Code.</font></th>
           <th style="width:700px;"><font size="14px">Account Title</font></th>
-          <th style="width:200px;"><font size="14px">Debit</font></th>
-          <th style="width:200px;"><font size="14px">Credit</font></th>
+          <th style="width:200px; text-align: right;"><font size="14px">Debit</font></th>
+          <th style="width:200px; text-align: right;"><font size="14px">Credit</font></th>
         </tr>
       </thead>
       <tbody>
@@ -90,7 +90,7 @@
       <tr class="heading_row">
         <td style="width: 150px; height:30px;">{{value.0}}</td>
         <td style="width: 700px;"><font size="12px">{{value.1}}</font></td>
-        <td style="width: 200px; text-align:center;">
+        <td style="width: 200px; text-align:right;">
           <font size="12px">
             {% if value.2 >= 0 %}
             {{value.2|floatformat:2}}
@@ -99,7 +99,7 @@
             {% endif %}
         </font>
         </td>
-        <td style="width: 200px; text-align:center;">
+        <td style="width: 200px; text-align:right;">
           <font size="12px">
             {% if value.2 <= 0 %}
             {{value.2|abs|floatformat:2}}
@@ -112,9 +112,9 @@
   </tr>
   <tr class="heading_row">
     <td style="width: 150px; height:30px;"></td>
-    <td style="width:700px; text-align:center;" colspan="1"><font size="14px"> <b>Grand Total</b> </font></td>
-    <td style="text-align:center;"><font size="12px"><b>{{debit_amount|floatformat:2}}</b></font></td>
-    <td style="text-align:center;"><font size="12px"><b>{{credit_amount|abs|floatformat:2}}</b></font></td>
+    <td style="width:700px; text-align:right;" colspan="1"><font size="14px"> <b>Grand Total</b> </font></td>
+    <td style="text-align:right;"><font size="12px"><b>{{debit_amount|floatformat:2}}</b></font></td>
+    <td style="text-align:right;"><font size="12px"><b>{{credit_amount|abs|floatformat:2}}</b></font></td>
   </tr>
     </tbody>
   </table>

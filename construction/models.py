@@ -112,6 +112,7 @@ class Transactions(models.Model):
     remarks = models.CharField(max_length = 100)
     voucherId = models.CharField(max_length = 100)
     userId = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
+    project_id = models.IntegerField()
 
 
 class CompanyInfo(models.Model):

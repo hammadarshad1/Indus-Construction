@@ -20,7 +20,7 @@ from django.contrib.auth.decorators import login_required
 from decimal import Decimal
 from django.db import transaction
 
-conn = mysql.connector.connect(user='root', host='localhost', port='3306', password='', database="Indus")
+conn = mysql.connector.connect(user='admin', host='localhost', port='3306', password='Gre@ter834', database="Indus")
 
 
 def flush_transaction():
@@ -300,6 +300,7 @@ def project(request):
             customerUpdate = request.POST.get('customerUpdate')
             ProjectName = request.POST.get('projectNameUpdate')
             Description = request.POST.get('descriptionUpdate')
+            print(ProjectId)
             account_id = ChartOfAccount.objects.get(id=customerUpdate)
             p = Project.objects.get(projectId=ProjectId)
             p.accountId = account_id
@@ -1062,3 +1063,62 @@ def trial_balance(request):
 @login_required
 def sale_detail_item_wise(request):
     pass
+
+@login_required
+def purchase(request):
+    return render(request, 'construction/purchase.html', {'title':'Purchase'})
+
+@login_required
+def new_purchase(request):
+    all_accounts = ChartOfAccount.objects.all()
+    inv = Inventory.objects.all()
+    get_last_tran_id = PurchaseHeader.objects.filter(purchaseNo__contains='PUR').last()
+    date = datetime.date.today()
+    date = date.strftime('%Y%m')
+    project = Project.objects.all()
+    if get_last_tran_id:
+        get_last_tran_id = get_last_tran_id.purchaseNo
+        get_last_tran_id = get_last_tran_id[7:]
+        serial = str((int(get_last_tran_id) + 1))
+        get_last_tran_id = date[2:]+'PUR'+serial
+    else:
+        get_last_tran_id =  date[2:]+'PUR1'
+        voucherId = 1
+    if request.method == "POST":
+        if request.POST.get('samp') == 'sale_new':
+            sub_menu = VoucherHeader.objects.all()
+            sub_menu = serializers.serialize('json',sub_menu)
+            print(sub_menu)
+            return JsonResponse({'sub_menu': sub_menu})
+        elif request.POST.get('samp') == 'purchaseSubmit':
+            PurchaseId = request.POST.get('purchaseId')
+            CustomerName = request.POST.get('customerName')
+            Date = request.POST.get('date')
+            PayMethod = request.POST.get('payMethod')
+            Description = request.POST.get('Description')
+            project_pur = request.POST.get('Project')
+            print(PurchaseId, CustomerName, Date, PayMethod, Description)
+
+            p = PurchaseHeader(purchaseNo=get_last_tran_id, payment_method=PayMethod, details=Description, tax=17, accountId= ChartOfAccount.objects.get(account_title=CustomerName), userId=request.user, projectId=Project.objects.get(projectId=project_pur))
+            p.save()
+            items = json.loads(request.POST.get('items'))
+
+            for item in items:
+                itemName = item['ItemName']
+                itemCategory = Category.objects.get(categoryId =item['ItemCategory'])
+                itemQuantity = item['Quantity']
+                Price = item['Price']
+                unit = item['Unit']
+                print(itemCategory)
+                item_add = Inventory(itemName = itemName, itemCategory=Category.objects.get(categoryName=itemCategory), itemQuantity= itemQuantity, unitPrice=0.0,unit=unit, projectId = Project.objects.get(projectId=project_pur), userId=request.user)
+                item_add.save()
+                pur_detail = PurchaseDetail(purchaseQuantity=itemQuantity, purchasePrice=Price, total=((int(unit)*int(Price))+(int(Price)*(17/100))), itemId=Inventory.objects.last(), purchaseHeaderId=PurchaseHeader.objects.last())
+                pur_detail.save()
+            return JsonResponse({'success':'success'})
+        elif request.POST.get('samp') == 'purchaseProject':
+            main_object_id = request.POST.get("main_object_id")
+            print(main_object_id)
+            sub_menu = Project.objects.filter(accountId=ChartOfAccount.objects.get(account_title=main_object_id)).all()
+            sub_menu = serializers.serialize('json',sub_menu)
+            return JsonResponse({'sub_menu':sub_menu}) 
+    return render(request, 'construction/new_purchase.html',{'title':'New Purchase', 'all_accounts': all_accounts, 'get_last_tran_id':get_last_tran_id, 'inv':inv, 'project':project})
