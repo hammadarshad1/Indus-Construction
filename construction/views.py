@@ -193,7 +193,7 @@ def chart_of_account(request):
             opening_balance = 0
         if op_type == "credit":
             opening_balance = -abs(Decimal(opening_balance))
-        coa = ChartOfAccount(account_title = account_title, parent_id = account_type, opening_balance = opening_balance, phone_no = phone_no, email_address = email_address, ntn = ntn, stn = stn, cnic = cnic ,Address = address, remarks = remarks, credit_limit=credit_limits, account_id = "100")
+        coa = ChartOfAccount(account_title = account_title, parent_id = account_type, opening_balance = opening_balance, phone_no = phone_no, email_address = email_address, ntn = ntn, stn = stn, cnic = cnic ,Address = address, remarks = remarks, credit_limit=credit_limits, account_id = "100", user_id=request.user)
         coa.save()
     return render(request, 'construction/chart_of_account.html',{'title':'Add Customer','all_accounts':all_accounts})
 
@@ -297,11 +297,11 @@ def project(request):
             project_add.save()
         else:
             ProjectId = request.POST.get('projectIdUpdate')
-            customerUpdate = request.POST.get('customerUpdate')
+            customerUpdate = request.POST.get('customer-id')
             ProjectName = request.POST.get('projectNameUpdate')
             Description = request.POST.get('descriptionUpdate')
-            print(ProjectId)
-            account_id = ChartOfAccount.objects.get(id=customerUpdate)
+            print(customerUpdate)
+            account_id = ChartOfAccount.objects.get(account_title=customerUpdate)
             p = Project.objects.get(projectId=ProjectId)
             p.accountId = account_id
             p.projectName = ProjectName
@@ -798,7 +798,7 @@ def purchase_new(request):
                 Qty = item['Qty']
                 Price = item['Price']
                 ST = item['ST']
-                s = PurchaseDetail(purchaseQuantity=Qty,purchasePrice=Price,total=((int(Qty)*int(Price))+(int(Price)*(int(ST)/100))),itemId=Inventory.objects.get(itemId=itemCode),purchaseHeaderId=PurchaseHeader.objects.get(purchaseNo=get_last_purchase_no))
+                s = PurchaseDetail(purchaseQuantity=Qty,purchasePrice=Price,total=((float(Qty)*float(Price))+(float(Price)*(float(ST)/100))),itemId=Inventory.objects.get(itemId=itemCode),purchaseHeaderId=PurchaseHeader.objects.get(purchaseNo=get_last_purchase_no))
                 s.save()
                 if payment_method == 'Cash':
                     tran2 = Transactions(refrenceId = 0, refrenceDate = datetime.date.today, accountId = ChartOfAccount.objects.get(account_id=client), tranType = "Purchase Invoice", amount = total_amount, date = date, remarks = purchase_id,ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
@@ -1088,7 +1088,7 @@ def new_purchase(request):
         if request.POST.get('samp') == 'sale_new':
             sub_menu = VoucherHeader.objects.all()
             sub_menu = serializers.serialize('json',sub_menu)
-            print(sub_menu)
+            print(get_last_tran_id[7:])
             return JsonResponse({'sub_menu': sub_menu})
         elif request.POST.get('samp') == 'purchaseSubmit':
             PurchaseId = request.POST.get('purchaseId')
@@ -1110,10 +1110,22 @@ def new_purchase(request):
                 Price = item['Price']
                 unit = item['Unit']
                 print(itemCategory)
-                item_add = Inventory(itemName = itemName, itemCategory=Category.objects.get(categoryName=itemCategory), itemQuantity= itemQuantity, unitPrice=0.0,unit=unit, projectId = Project.objects.get(projectId=project_pur), userId=request.user)
-                item_add.save()
-                pur_detail = PurchaseDetail(purchaseQuantity=itemQuantity, purchasePrice=Price, total=((int(unit)*int(Price))+(int(Price)*(17/100))), itemId=Inventory.objects.last(), purchaseHeaderId=PurchaseHeader.objects.last())
+                pur_detail = PurchaseDetail(purchaseQuantity=itemQuantity, purchasePrice=Price, total=((float(itemQuantity)*float(Price))+(float(Price)*(17/100))), itemId=Inventory.objects.last(), purchaseHeaderId=PurchaseHeader.objects.last())
                 pur_detail.save()
+                item_add = Inventory(itemName = itemName, itemCategory=Category.objects.get(categoryName=itemCategory), itemQuantity= itemQuantity, unitPrice=0.0,unit=unit, projectId=Project.objects.get(projectId=project_pur), userId=request.user)
+                item_add.save()
+                
+            GrandTotal = request.POST.get("grandTotal")    
+            if PayMethod == "Cash":
+                t1 = Transactions(refrenceId=get_last_tran_id[7:], refrenceDate=Date, accountId=ChartOfAccount.objects.get(id=4), tranType="Purchase Invoice", amount=-abs(float(GrandTotal)),refInvTranId=0, refInvTranType='', remarks=get_last_tran_id, userId=request.user, project_id=project_pur, voucherId='')
+                t2 = Transactions(refrenceId=get_last_tran_id[7:], refrenceDate=Date, accountId=ChartOfAccount.objects.get(account_title=CustomerName), tranType="Purchase Invoice", amount=abs(float(GrandTotal)),refInvTranId=0, refInvTranType='', remarks=get_last_tran_id, userId=request.user, project_id=project_pur, voucherId='')   
+                t1.save()
+                t2.save()
+            elif PayMethod == "Credit":
+                t1 = Transactions(refrenceId=get_last_tran_id[7:], refrenceDate=Date, accountId=ChartOfAccount.objects.get(id=8), tranType="Purchase Invoice", amount=abs(float(GrandTotal)),refInvTranId=0, refInvTranType='', remarks=get_last_tran_id, userId=request.user, project_id=project_pur, voucherId='')
+                t2 = Transactions(refrenceId=get_last_tran_id[7:], refrenceDate=Date, accountId=ChartOfAccount.objects.get(account_title=CustomerName), tranType="Purchase Invoice", amount=-abs(float(GrandTotal)),refInvTranId=0, refInvTranType='', remarks=get_last_tran_id, userId=request.user, project_id=project_pur, voucherId='')   
+                t1.save()
+                t2.save()
             return JsonResponse({'success':'success'})
         elif request.POST.get('samp') == 'purchaseProject':
             main_object_id = request.POST.get("main_object_id")

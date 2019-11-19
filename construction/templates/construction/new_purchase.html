@@ -60,6 +60,7 @@
       </div>
     </li>
     <li class="list-group-item">
+      
     <div class="table-title">
         <div class="row">
           <!-- <div class="form-group col-md-3">
@@ -83,10 +84,10 @@
             </datalist>
             </div>
             <datalist id="dc">
-            </datalist>
+            </datalist> -->
               <div style="margin-left:20px;">
-                  <button type="button" class="btn btn-info add-item-sale"><i class="fa fa-plus"></i>Insert Delivery Challan</button>
-              </div> -->
+                  <button type="button" class="btn btn-info add-item-sale" id='Add-Item'><i class="fa fa-plus"></i>Insert Item</button>
+              </div>
         </div>
     </div>
     <div class="table table-responsive">
@@ -107,22 +108,22 @@
               </tr>
           </thead>
           <tbody>
-            <td></td>
-            <td><input type="text" id="" style="width: 150px;"></td>
+            <!-- <td></td>
+            <td><input class='form-control form-control-sm' type="text" id="" style="width: 150px;"></td>
             <td><select class="form-control form-control-sm" id="jv_customer_title">
                 <option value="">Select Account:</option>
                 {% for inventory in inv %}
                 <option value="{{inventory.itemId}}">{{inventory.itemName}}</option>
                 {% endfor %}
               </select></td>
-            <td><input type="text" id="" style="width: 100px;"></td>
-            <td><input type="text" id="" style="width: 100px;"></td>
-            <td><input type="text" id="" style="width: 100px;"></td>
-            <td><input type="text" id="" style="width: 100px;" disabled></td>
+            <td><input class="form-control form-control-sm" type="text" id="" style="width: 100px;"></td>
+            <td><input class="form-control form-control-sm" type="text" id="" style="width: 100px;"></td>
+            <td><input class="form-control form-control-sm" type="text" id="" style="width: 100px;"></td>
+            <td><input class="form-control form-control-sm" type="text" id="" style="width: 100px;" disabled></td>
             <td>17%</td>
-            <td><input type="text" id="" style="width: 100px;" disabled value="0.00"></td>
-            <td><input type="text" id="" style="width: 100px;" disabled value="0.00"></td>
-            <td><a id='edit-PUR' hidden='hidden'><button class='btn' type='button'><i class='fas fa-pencil-alt' style='color:#e6e600;'></i></button></a><a id='add-PUR'><button class='btn' type='button'><i class='fas fa-plus' style='color:#00b300;'></i></button></a><a id='delete-PUR'><button class='btn' type='button'><i class='fa fa-trash' style='color:#ff0000;'></i></button></a></td>
+            <td><input class="form-control form-control-sm" type="text" id="" style="width: 100px;" disabled value="0.00"></td>
+            <td><input class="form-control form-control-sm" type="text" id="" style="width: 100px;" disabled value="0.00"></td>
+            <td><a id='edit-PUR' hidden='hidden'><button class='btn' type='button'><i class='fas fa-pencil-alt' style='color:#e6e600;'></i></button></a><a id='add-PUR'><button class='btn' type='button'><i class='fas fa-plus' style='color:#00b300;'></i></button></a><a id='delete-PUR'><button class='btn' type='button'><i class='fa fa-trash' style='color:#ff0000;'></i></button></a></td> -->
           </tbody>
       </table>
     </div>
@@ -226,11 +227,21 @@
 
   })
 
+  $("#Add-Item").on('click',function(){
+    $("#new-purchase-table").append("<tr><td></td><td><input class='form-control form-control-sm' type='text' id='' style='width: 150px;''></td><td><select class='form-control form-control-sm' id='jv_customer_title'><option value=''>Select Account:</option>{% for inventory in inv %}<option value='{{inventory.itemId}}'>{{inventory.itemName}}</option>{% endfor %}</select></td><td><input class='form-control form-control-sm' type='text' id='' style='width: 100px;'></td><td><input class='form-control form-control-sm' type='text' id='' style='width: 100px;'></td><td><input class='form-control form-control-sm' type='text' id='' style='width: 100px;'></td><td><input class='form-control form-control-sm' type='text' id='' style='width: 100px;' disabled></td><td>17%</td><td><input class='form-control form-control-sm' type='text' id='' style='width: 100px;' disabled value='0.00'></td><td><input class='form-control form-control-sm' type='text' id='' style='width: 100px;' disabled value='0.00'></td><td><a id='edit-PUR' hidden='hidden'><button class='btn' type='button'><i class='fas fa-pencil-alt' style='color:#e6e600;'></i></button></a><a id='add-PUR'><button class='btn' type='button'><i class='fas fa-plus' style='color:#00b300;'></i></button></a><a id='delete-PUR'><button class='btn' type='button'><i class='fa fa-trash' style='color:#ff0000;'></i></button></a></td></tr>");
+  });
+
   $('#new-purchase-table').on('click', '#delete-PUR', function(){
   var tr = $(this).closest('tr');
   tr.remove();
+  var tr = $(this).closest('tr');
+  total = tr.find('td:eq(9)');
+  total = total.find('input');
+  gTotal = gTotal-parseFloat(total.val());
+  $("#last_grand_total").empty();
+  $("#last_grand_total").val(gTotal);
 });
-
+var gTotal = 0;
 $('#new-purchase-table').on('click','#add-PUR ',function(){
   var tr = $(this).closest('tr');
   var itemNameTd = tr.find('td:eq(1)');
@@ -260,9 +271,14 @@ $('#new-purchase-table').on('click','#add-PUR ',function(){
   unitInput.attr('disabled','disabled');
   priceInput = priceTd.find('input');
   priceInput.attr('disabled','disabled');
-  vogInput.val(priceInput.val()*unitInput.val())
+  vogInput.val(priceInput.val()*quantityInput.val())
   st.val(vogInput.val()*(17/100));
-  total.val(parseInt(vogInput.val())+parseInt(st.val()));
+  total.val(parseFloat(vogInput.val())+parseFloat(st.val()));
+  gTotal = gTotal+parseFloat(total.val());
+  $("#last_grand_total").empty();
+  $("#last_grand_total").val(gTotal);
+  
+  console.log(gTotal);
 });
 
 
@@ -275,7 +291,8 @@ $('#new-purchase-table').on('click','#edit-PUR ',function(){
   var priceTd = tr.find('td:eq(5)');
   var vogTd = tr.find('td:eq(6)');
   var plus_button = tr.find('td:eq(10)');
-
+  var total = tr.find('td:eq(9)');
+  total = total.find('input');
   plus = plus_button.find('#add-PUR');
   plus.attr('hidden','true');
   pencil_button = plus_button.find('#add-PUR');
@@ -295,7 +312,9 @@ $('#new-purchase-table').on('click','#edit-PUR ',function(){
   vogInput.removeAttr('disabled');
   pencil_button = plus_button.find('#edit-PUR');
   pencil_button.attr('hidden','hidden');
-
+  gTotal = gTotal-parseFloat(total.val());
+  $("#last_grand_total").empty();
+  $("#last_grand_total").val(gTotal);
 });
 
 
@@ -352,6 +371,7 @@ $("#new-sale-submit").on('submit',function(e){
                                     'payMethod': $("#payment_method option:selected").val(),
                                     'Project':$("#project_sale option:selected").val(),
                                     'Description':$("#footer_desc").val(),
+                                    "grandTotal":$("#last_grand_total").val(),
                                     'items': JSON.stringify(data)
                                 },
                                 dataType: 'json'
