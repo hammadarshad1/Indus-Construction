@@ -689,6 +689,26 @@ def bank_payment_voucher_new(request):
     return render(request, 'construction/bank_payment_voucher_new.html',{'title':'Bank Payment Voucher New','cof':cof,'get_last_tran_id':get_last_tran_id,'all_bank_accounts':all_bank_accounts})
 
 @login_required
+def pur_pdf(request, pk):
+    company_info = CompanyInfo.objects.all()
+    header = PurchaseHeader.objects.filter(purchaseHeaderId = pk).first()
+    detail = PurchaseDetail.objects.filter(purchaseHeaderId=header).all()
+    item = PurchaseDetail.objects.get(purchaseHeaderId=header)
+    inv = Inventory.objects.filter(itemName=item)
+
+    item = item.itemId
+    print(item)
+
+    pdf = render_to_pdf('construction/pur_pdf.html', {'company_info':company_info, 'header':header, 'detail':detail})
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = "Purchase_Summary.pdf"
+        content = "inline; filename='%s'" %(filename)
+        response['Content-Disposition'] = content
+        return response
+    return HttpResponse("Not found")
+
+@login_required
 def jv_pdf(request, pk):
     company_info = CompanyInfo.objects.all()
     header = VoucherHeader.objects.filter(voucherId = pk).first()
@@ -791,7 +811,7 @@ def purchase(request):
 def delete_purchase_voucher(request, pk):
     # vc = PurchaseHeader.objects.get(purchaseHeaderId=pk)
     vp = PurchaseHeader.objects.filter(purchaseHeaderId=pk).delete()
-    inv = Inventory.objects.filter()
+    # inv = Inventory.objects.filter()
     tran = Transactions.objects.filter(refInvTranId=pk).all().delete()
     print("deleted")
     return redirect('Purchase')

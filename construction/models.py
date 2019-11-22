@@ -67,6 +67,7 @@ class PurchaseHeader(models.Model):
     accountId = models.ForeignKey(ChartOfAccount, on_delete = models.CASCADE)
     userId = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
     projectId = models.ForeignKey(Project, on_delete = models.CASCADE)
+    
 
     def __str__(self):
         return self.purchaseNo
