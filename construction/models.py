@@ -17,7 +17,7 @@ class ChartOfAccount(models.Model):
     account_id = models.CharField(max_length = 100)
     account_title = models.CharField(max_length = 100, unique = True)
     parent_id = models.IntegerField()
-    opening_balance = models.DecimalField(max_digits = 8, decimal_places = 2)
+    opening_balance = models.DecimalField(max_digits = 20, decimal_places = 2)
     phone_no = models.CharField(max_length = 100)
     email_address = models.CharField(max_length = 100)
     ntn = models.CharField(max_length = 100)
@@ -25,7 +25,7 @@ class ChartOfAccount(models.Model):
     cnic = models.CharField(max_length = 100)
     Address = models.CharField(max_length = 200)
     remarks = models.CharField(max_length = 100)
-    credit_limit = models.DecimalField(max_digits = 8, decimal_places = 2)
+    credit_limit = models.DecimalField(max_digits = 20, decimal_places = 2)
     user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
 
 
@@ -35,7 +35,7 @@ class ChartOfAccount(models.Model):
 class Project(models.Model):
     projectId = models.AutoField(primary_key = True)
     projectName = models.CharField(max_length = 100)
-    amount = models.FloatField()
+    amount = models.DecimalField(max_digits = 20, decimal_places = 2)
     accountId = models.ForeignKey(ChartOfAccount, on_delete = models.CASCADE)
     userId = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
     narration = models.TextField()
@@ -49,8 +49,8 @@ class Inventory(models.Model):
     itemId = models.AutoField(primary_key = True)
     itemName = models.CharField(max_length = 100)
     itemCategory = models.ForeignKey(Category, on_delete = models.CASCADE)
-    itemQuantity = models.FloatField()
-    unitPrice = models.FloatField()
+    itemQuantity = models.DecimalField(max_digits = 20, decimal_places = 2)
+    unitPrice = models.DecimalField(max_digits = 20, decimal_places = 2)
     userId = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
     projectId = models.ForeignKey(Project, on_delete = models.CASCADE)
     unit = models.CharField(max_length = 100)
@@ -63,7 +63,7 @@ class PurchaseHeader(models.Model):
     purchaseNo = models.CharField(max_length = 100)
     payment_method = models.CharField(max_length = 100)
     details = models.TextField()
-    tax = models.FloatField()
+    tax = models.DecimalField(max_digits = 20, decimal_places = 2)
     accountId = models.ForeignKey(ChartOfAccount, on_delete = models.CASCADE)
     userId = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
     projectId = models.ForeignKey(Project, on_delete = models.CASCADE)
@@ -73,9 +73,9 @@ class PurchaseHeader(models.Model):
 
 class PurchaseDetail(models.Model):
     purchaseDetailId = models.AutoField(primary_key = True)
-    purchaseQuantity = models.FloatField()
-    purchasePrice = models.FloatField()
-    total = models.FloatField()
+    purchaseQuantity = models.DecimalField(max_digits = 20, decimal_places = 2)
+    purchasePrice = models.DecimalField(max_digits = 20, decimal_places = 2)
+    total = models.DecimalField(max_digits = 20, decimal_places = 3, blank=True, null=True)
     itemId = models.ForeignKey(Inventory, on_delete = models.CASCADE)
     purchaseHeaderId = models.ForeignKey(PurchaseHeader, on_delete = models.CASCADE)
 
@@ -94,8 +94,8 @@ class VoucherHeader(models.Model):
 
 class VoucherDetail(models.Model):
     accountId = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True)
-    debit = models.DecimalField(max_digits = 8, decimal_places = 2)
-    credit = models.DecimalField(max_digits = 8, decimal_places = 2)
+    debit = models.DecimalField(max_digits = 20, decimal_places = 2)
+    credit = models.DecimalField(max_digits = 20, decimal_places = 2)
     invoiceId = models.IntegerField()
     voucherId = models.ForeignKey(VoucherHeader, on_delete = models.CASCADE)
 
@@ -105,7 +105,7 @@ class Transactions(models.Model):
     refrenceDate = models.DateField(blank = True)
     accountId = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True)
     tranType = models.CharField(max_length = 100)
-    amount = models.DecimalField(max_digits = 8, decimal_places = 2)
+    amount = models.DecimalField(max_digits = 20, decimal_places = 2)
     date = models.DateField(default = datetime.date.today)
     refInvTranId = models.IntegerField()
     refInvTranType = models.CharField(max_length = 100)

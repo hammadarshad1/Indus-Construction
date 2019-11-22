@@ -5,7 +5,7 @@
 
 <div class="card" style="width: 100%;">
 <div class="card-header">
-  <h4>View Journal Voucher</h4>
+  <h4>View Purchase Voucher</h4>
 </div>
 <ul class="list-group list-group-flush">
 <form  action="" id="" autocomplete="off"  method="post">
@@ -14,26 +14,26 @@
       <div class="form-row">
         <div class="form-group col-md-2">
           <label for="">Transaction ID</label>
-          <input type="text" readonly class="form-control form-control-sm" required value="{{ jv_header.voucherNo }}" id="tran_id">
+          <input type="text" readonly class="form-control form-control-sm" required value="{{ jv_header.purchaseNo }}" id="tran_id">
         </div>
         <div class="form-group col-md-2">
-          <label for="">Document #</label>
-          <input type="text" list="inv_no" id="doc_no" class="form-control form-control-sm" value="{{jv_header.docNo}}"/>
-          <datalist class="" id="inv_no">
+          <label for="">Payment Method</label>
+          <input type="text" list="inv_no" id="doc_no" class="form-control form-control-sm" value="{{jv_header.payment_method}}"/>
+          <!-- <datalist class="" id="inv_no">
             {% for v in all_invoices %}
               <option value="{{v.sale_no}}">{{v.sale_no}}</option>
             {% endfor %}
-          </datalist>
+          </datalist> -->
           <!-- <input type="checkbox" name="check" id="sales_tax_check" class="check">
           <label for="">Sales Tax</label> -->
         </div>
         <div class="form-group col-md-2">
-          <label for="">Document Date</label>
-          <input type="date"  class="form-control form-control-sm" required value="{{jv_header.docDate|date:"Y-m-d"}}" id="doc_date">
+          <label for="">Project</label>
+          <input type="text"  class="form-control form-control-sm" required value="{{jv_header.projectId}}" id="doc_date">
         </div>
         <div class="form-group col-md-2">
           <label for="">Description</label>
-          <textarea name="name" style="width:370px; height:30px;" id="description">{{jv_header.description}}</textarea>
+          <textarea name="name" style="width:370px; height:30px;" id="description">{{jv_header.details}}</textarea>
         </div>
       </div>
       </li>
@@ -57,9 +57,9 @@
           <thead>
               <tr>
                 <th width="70px">S No:</th>
-                  <th width="100px">Account Id</th>
-                  <th width="100px">Debit</th>
-                  <th width="100px">Credit</th>
+                  <th width="100px">Item Name</th>
+                  <th width="100px">Purchase Price</th>
+                  <th width="100px">Total</th>
                   <!-- <th>Action</th> -->
               </tr>
           </thead>
@@ -67,9 +67,9 @@
           <tbody>
             <tr>
               <td>{{forloop.counter}}</td>
-              <td>{{value.accountId}}</td>
-              <td>{{value.debit}}</td>
-              <td>{{value.credit|abs}}</td>
+              <td>{{value.itemId}}</td>
+              <td>{{value.purchasePrice}}</td>
+              <td>{{value.total}}</td>
               <!-- <td><a class="add-jv-edit" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-jv-edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-jv-edit" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td> -->
             </tr>
           </tbody>
@@ -79,7 +79,7 @@
     </li>
       <br>
     <div class="text-center">
-      <a href="{% url 'Journal-Voucher' %}" type="button" class="btn btn-outline-primary has_id">Go Back</a>
+      <a href="{% url 'Purchase' %}" type="button" class="btn btn-outline-primary has_id">Go Back</a>
 
     </div>
     <br>

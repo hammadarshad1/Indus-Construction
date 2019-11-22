@@ -4,6 +4,24 @@
         <div class="col-md-12">
           <a role="button" href="" style="float:right;" class="btn btn-outline-secondary" name="button" data-toggle="modal" data-target="#addProjectModal"><i class="fas fa-plus"></i> Add New</a>
         </div>
+        <!-- <div class="col-md-2">
+            <div class="form-group col-md-12">
+                <label for="">Customer</label>
+                <select class="form-control form-control-sm main_drop" id="customerCheck" name="customerCheck">
+                  <option value="">Select:</option>
+                  {% for chartofaccount in chartofaccounts %}
+                      <option value="{{ chartofaccount.id }}">{{ chartofaccount.account_title }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+          <div class="form-group col-md-12">
+            <label for="">Projects</label>
+            <select class="form-control form-control-sm main_drop" id="projectCheck" name="projectCheck">
+              <option value="">Select:</option>
+              
+            </select>
+          </div>
+        </div> -->
     </div>
       <h4>Projects</h4>
     <div class="table table-responsive">
@@ -170,6 +188,22 @@
 
     <script>
 
+function getCookie(c_name)
+{
+if (document.cookie.length > 0)
+{
+    c_start = document.cookie.indexOf(c_name + "=");
+    if (c_start != -1)
+    {
+        c_start = c_start + c_name.length + 1;
+        c_end = document.cookie.indexOf(";", c_start);
+        if (c_end == -1) c_end = document.cookie.length;
+        return unescape(document.cookie.substring(c_start,c_end));
+    }
+}
+return "";
+}
+
         $("#dataTable tbody").on('click','#editProjectButton', function(){
             var tr = $(this).closest('tr');
             var projectName = tr.find('td:eq(2)').text();
@@ -200,6 +234,31 @@
         $("#customer-id").attr('value', $("#customerUpdate option:selected").text())
      });
     
+
+     $("#customerCheck").on('change', function(){
+      main_object_id = this.value;
+    console.log(main_object_id);
+    req =	$.ajax({
+     headers: { "X-CSRFToken": getCookie("csrftoken") },
+     type: 'POST',
+     url : '/projects/',
+     data:{
+       'main_object_id':main_object_id ,
+       'samp':"projectCheck",
+     },
+     dataType: 'json'
+    })
+    .done(function done(data) {
+      sub_menu = JSON.parse(data.sub_menu);
+      $('#projectCheck').empty()
+      $('#projectCheck').append($("<option></option>").attr("value",3).text("General"));
+      for (var i = 0; i < sub_menu.length; i++) {
+          $('#projectCheck').append($("<option></option>").attr("value",sub_menu[i].pk).text(sub_menu[i].fields["projectName"]));
+          console.log(sub_menu[i].pk);
+      }
+
+    })
+  });
     </script>
 
 {% endblock %}

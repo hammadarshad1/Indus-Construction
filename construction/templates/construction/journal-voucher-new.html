@@ -185,6 +185,7 @@ $("#new-jv-table").on('click','#edit-JV',function(){
 
   $("#jv-account_title").on('change', function(){
     main_object_id = this.value;
+    console.log(main_object_id);
     req =	$.ajax({
      headers: { "X-CSRFToken": getCookie("csrftoken") },
      type: 'POST',
@@ -284,6 +285,7 @@ $("#new-jv-table").on('click','#edit-JV',function(){
                     dataType: 'json'
                 })
         .done(function done(data){
+          alert("Successfully Added!");
             location.reload();
         })
       } else {

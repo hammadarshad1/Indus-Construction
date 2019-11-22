@@ -8,7 +8,7 @@
             <a role="button" href="{% url 'Add-Category' %}" style="float:right;" class="btn btn-outline-secondary" ><i class="fas fa-plus"></i> Add New Category</a>
           </div>
           <div class="col-md-10">
-            <a role="button" href="{% url 'new-purchase' %}" style="float:right;" class="btn btn-outline-secondary" name="button" ><i class="fas fa-plus"></i> Add New</a>
+            <a role="button" href="{% url 'new-purchase' %}" style="float:right;" class="btn btn-outline-secondary" name="button" ><i class="fas fa-plus"></i> Purchase</a>
           </div>
         </div>
     </div>
@@ -36,7 +36,7 @@
                     <td>{{ inventory.projectId }}</td>
                     <td>{{ inventory.unitPrice }}</td>
                     <td>{{ inventory.unit }}</td>
-                    <td><a data-toggle="modal" data-target="#updateInventoryModal" id='editInventoryButton'><button class="btn"><i class="fas fa-pencil-alt" style="color: #ffcc00"></i></button></a><a data-toggle="modal" data-target="#deleteInventoryModal" class='delete-inventory' id='{{ inventory.itemId }}'><button class="btn" id='inventoryDeleteButton'><i class="fa fa-trash" style="color:#ff1a1a;"></i></button></a></td>
+                    <td><a data-toggle="modal" data-target="#updateInventoryModal" id='editInventoryButton'><button class="btn"><i class="fas fa-pencil-alt" style="color: #ffcc00"></i></button></a></td>
                   </tr>
                 {% endfor %}
         </table>
@@ -146,6 +146,8 @@
                                            <div class="form-group col-md-12">
                                              <input type="hidden"  class="form-control form-control-sm" value='edit-inventory' name='inventory-edit-or-delete'>
                                              <input type='text' style='' class="form-control form-control-sm" name='inventoryIdUpdate' id='inventoryIdUpdate'>
+                                             <input type="hidden"  class="form-control form-control-sm" value="" name='project-id' id='project-id'>
+
                                           <label for="">Project</label>
                                           <select class="form-control form-control-sm main_drop" id="ProjectUpdate" name="ProjectUpdate">
                                             <option value="">Select:</option>
@@ -158,7 +160,9 @@
                                              <label for="">Item Name</label>
                                              <input type="text"  class="form-control form-control-sm" id="ItemNameUpdate" name="ItemNameUpdate">
                                            </div>
+
                                          <div class="form-group col-md-12">
+                                            <input type="hidden"  class="form-control form-control-sm" value="" name='item-id' id='item-id'>
                                           <label for="">Item Category</label>
                                           <select class="form-control form-control-sm main_drop" id="ItemCategoryUpdate" name="ItemCategoryUpdate">
                                             <option value="">Select:</option>
@@ -211,11 +215,15 @@
 
                 $("#ItemNameUpdate").val(itemName);
                 $("#ItemQuantityUpdate").val(itemQuantity);
-                $("#ProjectUpdate").val(project);
+                $("#ProjectUpdate option:selected").text(project);
+                $("#ItemCategoryUpdate option:selected").text(itemCategory);
                 $("#UnitPriceUpdate").val(unitPrice);
                 $("#UnitUpdate").val(unit);
+                $("#project-id").val(project);
                 $("#inventoryIdUpdate").val(itemId);
+                $("#item-id").val(itemCategory);
 
+                console.log($("#project-id").val(), $("#item-id").val())
                 console.log(itemName, itemId)
 
                 // $("#projectNameUpdate").val(projectName)
@@ -250,5 +258,17 @@
             //     });
             //   }
             // })
+
+            $("#ProjectUpdate").on('change',function(){
+        $("#project-id").attr('value', $("#ProjectUpdate option:selected").text())
+          
+        console.log($("#project-id").val());
+     });
+     
+     $("#ItemCategoryUpdate").on('change',function(){
+        $("#item-id").attr('value', $("#ItemCategoryUpdate option:selected").text())
+          
+        console.log($("#item-id").val());
+     });
           </script>
 {% endblock %}

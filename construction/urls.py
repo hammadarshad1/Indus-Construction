@@ -1,11 +1,12 @@
 from django.urls import path
 from .views import (home, addProject, addCategory, inventory, chart_of_account, project, delete_project,
-delete_inventory_category, delete_inventory, delete_chartofaccount,
+delete_inventory_category, delete_inventory,
  journal_voucher, journal_voucher_new, delete_journal_voucher, cash_receiving_voucher, cash_receiving_voucher_new,
  bank_receiving_voucher, bank_receiving_voucher_new, edit_chart_of_account, delete_chart_of_account, cash_payment_voucher,
- cash_payment_voucher_new, bank_payment_voucher, bank_payment_voucher_new, delete_journal_voucher,jv_pdf,crv_pdf, purchase, purchase_new, brv_pdf,
+ cash_payment_voucher_new, bank_payment_voucher, bank_payment_voucher_new, delete_journal_voucher,jv_pdf,crv_pdf, purchase, brv_pdf,
  cpv_pdf, bpv_pdf, delete_cash_receiving_voucher, delete_bank_receiving_voucher, delete_cash_payment_voucher, delete_bank_payment_voucher, view_journal_voucher, view_cash_receiving_voucher,
- report, sale_summary_item_wise, account_ledger, trial_balance, sale_detail_item_wise, view_bank_receiving_voucher, view_cash_payment_voucher, view_bank_payment_voucher, purchase, new_purchase)
+ report, sale_summary_item_wise, account_ledger, trial_balance, sale_detail_item_wise, view_bank_receiving_voucher, view_cash_payment_voucher, view_bank_payment_voucher, purchase, new_purchase,view_purchase_voucher,
+ delete_purchase_voucher)
 
 urlpatterns = [
     path('', home, name='Home'),
@@ -17,8 +18,9 @@ urlpatterns = [
     path('project/delete/<pk>', delete_project, name = 'Delete-Project'),
     path('inventory/category/delete/<pk>',delete_inventory_category, name = 'Delete-Inventory-Category'),
     path('inventory/delete/<pk>', delete_inventory, name= 'Delete-Inventory'),
-    path('chartofaccount/delete/<pk>',delete_chartofaccount, name='Delete-ChartOfAccount'),
+    # path('chartofaccount/delete/<pk>',delete_chartofaccount, name='Delete-ChartOfAccount'),
     path('transaction/journal_voucher/delete/<pk>', delete_journal_voucher, name='Delete-Journal-Voucher'),
+    path('transaction/purchase/delete/<pk>',  delete_purchase_voucher, name='Delete-Purchase-Voucher'),
     path('transaction/cash_receiving_voucher/delete/<pk>', delete_cash_receiving_voucher, name='Delete-Cash-Receiving'),
     path('transaction/bank_receiving_voucher/delete/<pk>', delete_bank_receiving_voucher, name='Delete-Bank-Receiving'),
     path('transaction/cash_payment_voucher/delete/<pk>', delete_cash_payment_voucher, name='Delete-Cash-Payment'),
@@ -37,7 +39,8 @@ urlpatterns = [
     path('transaction/bank_payment_voucher', bank_payment_voucher, name='Bank-Payment-Voucher'),
     path('transaction/bank_payment_voucher/new',bank_payment_voucher_new, name='Bank-Payment-Voucher-New'),
     path('transaction/purchase',purchase, name='Purchase'),
-    path('transaction/purchase/new',purchase_new, name='Purchase-New'),
+    path('transaction/purchase/view/<pk>', view_purchase_voucher, name='View-Purchase-Voucher'),
+    # path('transaction/purchase/new',purchase_new, name='Purchase-New'),
     path('jv_pdf/<pk>', jv_pdf, name='jv-pdf'),
     path('crv_pdf/<pk>', crv_pdf, name='crv'),
     path('brv_pdf/<pk>', brv_pdf, name='brv'),
@@ -53,6 +56,5 @@ urlpatterns = [
     path('account_ledger/pdf/', account_ledger, name = 'account-ledger'),
     path('trial_balance/pdf/', trial_balance, name = 'trial-balance'),
     path('sale_detail_item_wise/pdf/', sale_detail_item_wise, name = 'sale-detail-item-wise'),
-    path('transaction/purchase/', purchase, name = 'purchase'),
     path('transaction/purchase/new/', new_purchase, name = 'new-purchase'),
 ]

@@ -233,7 +233,7 @@
             location.reload();
         })
     })
-    $("#amount").blur(function(){
+    $("#amount").change(function(){
     var inp = $("#amount");
     if (inp.val().length > 0) {
     $("#insert-crv-account-to-table").removeAttr('disabled');
