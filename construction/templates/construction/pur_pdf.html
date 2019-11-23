@@ -39,7 +39,7 @@
          {% for value in company_info %}
          <h1 style="text-align:center; font-size:250%; font-family: "Times New Roman", Times, serif; " color="#0a012c" ><b>{{value.companyName}}</b></h1>
          {% endfor %}
-         <p style="text-align:center; padding-top:-30px ;font-size:200%; font-family: "Times New Roman", Times, serif; " color="#0a012c"  ><u>PURCHASE VOUCHER</u></p>
+         <p style="text-align:center; padding-top:-30px ;font-size:200%; font-family: "Times New Roman", Times, serif; " color="#0a012c"  ><u>PURCHASE SUMMARY</u></p>
      </div>
     </div>
     <!-- Content for Static Frame 'footer_frame' -->
@@ -66,7 +66,7 @@
          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-         <font size="5">Customer&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</font><font size="5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{header.accountId}}</font>
+         <font size="5">Supplier&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</font><font size="5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{header.accountId}}</font>
          <br>
          <br>
       <br>
@@ -74,28 +74,33 @@
       <table cellpadding="3" id="item_table" repeat="1">
           <thead>
             <tr class="heading_row">
-              <th align="center" style="width: 50px;"><font size="13px">ID</font></th>
-              <th style="width:700px;"><font size="13px">D  E  S  C  R  I  P  T  I  O  N</font></th>
-              <th style="width:200px;"><font size="13px">Dr.</font></th>
-              <th style="width:200px;"><font size="13px">Cr.</font></th>
+              <th align="center" style="width: 10px;"><font size="13px">ID</font></th>
+              <th style="width:400px;"><font size="13px">I N V E N T O R Y</font></th>
+              <th style="width:100px;"><font size="13px">U N I T</font></th>
+              <th style="width:200px;"><font size="13px">P R I C E</font></th>
+
             </tr>
           </thead>
           <tbody>
             {% for value in detail %}
             <tbody>
               <tr>
-                <td style="border-left:1px solid black; border-right:1px solid black;"><font size="13px">{{value.accountId.id}}</font></td>
-                <td style="border-left:1px solid black; border-right:1px solid black;"><font size="13px">{{value.accountId.account_title}}</font></td>
-                <td style="text-align:center; width:200px; border-right:1px solid black; text-align: right"><font size="13px">{{value.debit}}</font></td>
-                <td style="text-align:center; width:200px; border-right:1px solid black; text-align: right"><font size="13px">{{value.credit|abs}}</font></td>
+                <td style="border-left:1px solid black; border-right:1px solid black;"><font size="13px">{{value.purchaseDetailId}}</font></td>
+                <td style="border-left:1px solid black; border-right:1px solid black;"><font size="13px">{{value.itemId}}</font></td>
+                <td style="border-left:1px solid black; border-right:1px solid black;"><font size="13px">{{value.purchaseQuantity}}</font></td>
+                
+                <td style="text-align:center; width:200px; border-right:1px solid black; text-align: right"><font size="13px">{{value.purchasePrice}}</font></td>
+                
               </tr>
             </tbody>
             {% endfor %}
           <tr class="heading_row">
             <td style="width: 200px;"></td>
             <td style="width:900px; text-align: right;"><font size="13px"><b> T O T A L </b></font></td>
-            <td  style="text-align:center; width:200px; text-align: right" ><font size="14px"><b>{{debit.debit__sum|floatformat:2|abs}}</b></font></td>
-            <td  style="text-align:center; width:200px; text-align: right" ><font size="14px"><b>{{credit.credit__sum|floatformat:2|abs}}</b></font></td>
+            {% for value in detail %}
+            <td style="width: 100px;"></td>
+            <td  style="text-align:center; width:200px; text-align: right" ><font size="14px"><b>{{value.total}}</b></font></td>
+            {% endfor %}
           </tr>
         </tbody>
       </table>

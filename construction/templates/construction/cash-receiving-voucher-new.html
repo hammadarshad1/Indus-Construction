@@ -174,7 +174,7 @@
       .done(function done(data) {
         sub_menu = JSON.parse(data.sub_menu)
         $('#crv-project_id').empty()
-        $('#crv-project_id').append($("<option></option>").attr("value",3).text("General"));
+        $('#crv-project_id').append($("<option></option>").attr("value",17).text("General"));
         for (var i = 0; i < sub_menu.length; i++) {
             $('#crv-project_id').append($("<option></option>").attr("value",sub_menu[i].pk).text(sub_menu[i].fields["projectName"]));
         }

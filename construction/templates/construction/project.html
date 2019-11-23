@@ -29,8 +29,8 @@
                 <tr>
                     <th width="10px">S NO.</th>
                     <th style='display: none;'>proj id</th>
-                    <th>Project Name</th>
                     <th>Customer</th>
+                    <th>Project Name</th>
                     <th>user</th>
                     <th>Date</th>
                     <th>Description</th>
@@ -40,8 +40,8 @@
                   <tr>
                     <td width="10px">{{ forloop.counter }}</td>
                     <td style="display: none;" id=inventoryId>{{ project.projectId }}</td>
-                    <td>{{ project.projectName }}</td>
-                    <td value='{{ project.accountId.accountId }}'>{{ project.accountId }}</td>
+                    <td>{{ project.accountId }}</td>
+                    <td value='{{ project.accountId.accountId }}'>{{ project.projectName }}</td>
                     <td>{{ project.userId }}</td>
                     <td>{{ project.projectDate }}</td>
                     <td>{{ project.narration }}</td>
@@ -66,6 +66,10 @@
                     {% csrf_token %}
                      <div class="modal-body">
                          <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label for="">Project Id</label>
+                                <input type="text" readonly class="form-control form-control-sm" required value="{{ get_last_tran_id }}" id="tran_id">
+                              </div>
                            <div class="form-group col-md-12">
                              <label for="">Project Name</label>
                              <input type="hidden"  class="form-control form-control-sm" value='new-project' name='project-edit-or-delete'>
@@ -88,6 +92,10 @@
                             <option value="Credit">Credit</option>
                           </select>
                         </div> -->
+                        <div class="form-group col-md-12">
+                            <label for="">Amount</label>
+                            <input type="number"  class="form-control form-control-sm" id="amount" name="amount">
+                          </div>
                             <div class="form-group col-md-12">
                              <label for="">Description</label>
                              <textarea name="description" id="description" rows="1" cols="44"></textarea>

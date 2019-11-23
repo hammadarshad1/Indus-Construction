@@ -41,6 +41,7 @@ class Project(models.Model):
     narration = models.TextField()
     projectDate = models.DateField(default = datetime.date.today)
     payMethod = models.CharField(max_length = 10)
+    projectCode = models.CharField(max_length=100)
 
     def __str__(self):
         return self.projectName

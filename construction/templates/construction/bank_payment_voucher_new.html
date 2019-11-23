@@ -169,7 +169,7 @@ $("#new-bpv-table").on('click','#edit-BPV',function(){
     .done(function done(data) {
       sub_menu = JSON.parse(data.sub_menu)
       $('#bpv-project_id').empty()
-      $('#bpv-project_id').append($("<option></option>").attr("value",3).text("General"));
+      $('#bpv-project_id').append($("<option></option>").attr("value",17).text("General"));
       console.log(sub_menu);
       for (var i = 0; i < sub_menu.length; i++) {
           $('#bpv-project_id').append($("<option></option>").attr("value",sub_menu[i].pk).text(sub_menu[i].fields["projectName"]));

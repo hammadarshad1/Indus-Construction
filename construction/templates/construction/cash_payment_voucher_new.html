@@ -158,7 +158,7 @@ return "";
     .done(function done(data) {
       sub_menu = JSON.parse(data.sub_menu)
       $('#cpv-project_id').empty()
-      $('#cpv-project_id').append($("<option></option>").attr("value",3).text("General: "));
+      $('#cpv-project_id').append($("<option></option>").attr("value",17).text("General: "));
       console.log(sub_menu);
       for (var i = 0; i < sub_menu.length; i++) {
           $('#cpv-project_id').append($("<option></option>").attr("value",sub_menu[i].pk).text(sub_menu[i].fields["projectName"]));

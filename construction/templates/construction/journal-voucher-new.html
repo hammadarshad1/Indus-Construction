@@ -27,7 +27,7 @@
           <input type="date"  class="form-control form-control-sm" required value="" id="doc_date">
         </div>
         <div class="form-group col-md-2">
-          <label for="">Customer</label>
+          <label for="">Account</label>
           <select class="form-control form-control-sm" id="jv_customer_title">
             <option value="">Select Account:</option>
             {% for value in chartofaccount %}
@@ -75,7 +75,7 @@
     <div class="table-title">
         <div class="row">
           <div class="col-md-2">
-            <label for="">Account</label>
+            <label for="">Account/Head</label>
             <select class="form-control form-control-sm" id="jv-account_title">
               <option value="">Select Account:</option>
               {% for value in chartofaccount %}
@@ -199,7 +199,7 @@ $("#new-jv-table").on('click','#edit-JV',function(){
     .done(function done(data) {
       sub_menu = JSON.parse(data.sub_menu);
       $('#jv-project_id').empty()
-      $('#jv-project_id').append($("<option></option>").attr("value",3).text("General"));
+      $('#jv-project_id').append($("<option></option>").attr("value",17).text("General"));
       console.log(sub_menu);
       for (var i = 0; i < sub_menu.length; i++) {
           $('#jv-project_id').append($("<option></option>").attr("value",sub_menu[i].pk).text(sub_menu[i].fields["projectName"]));
@@ -223,7 +223,7 @@ $("#new-jv-table").on('click','#edit-JV',function(){
     .done(function done(data) {
       sub_menu = JSON.parse(data.sub_menu);
       $('#jv_project_id').empty()
-      $('#jv_project_id').append($("<option></option>").attr("value",3).text("General"));
+      $('#jv_project_id').append($("<option></option>").attr("value",17).text("General"));
       for (var i = 0; i < sub_menu.length; i++) {
           $('#jv_project_id').append($("<option></option>").attr("value",sub_menu[i].pk).text(sub_menu[i].fields["projectName"]));
           console.log(sub_menu[i].pk);
