@@ -31,20 +31,20 @@
                 <div class="row">
                     <div class="col-md-12">
                       <div class="table table-responsive">
-                      <table class="table table-bordered " id="dataTable">
+                      <table class="table table-bordered sort" id="dataTable">
                           <thead>
                               <tr>
-                                  <th width="40px">S NO.</th>
-                                  <th width="550px">Account Title</th>
-                                  <td>Action</td>
+                                  <th width="70px" style=" font-size: 14px;">S NO.</th>
+                                  <th width="550px" style=" font-size: 14px;">Account Title</th>
+                                  <td style=" font-size: 14px;">Action</td>
                               </tr>
                           </thead>
                           <tbody>
                             {% for value in all_accounts %}
                             <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td style="display:none;" >{{ value.id }}</td>
-                                <td>{{ value.account_title }}</td>
+                                <td style=" font-size: 14px;">{{ forloop.counter }}</td>
+                                <td style="display:none; font-size: 14px;" >{{ value.id }}</td>
+                                <td style=" font-size: 14px;">{{ value.account_title }}</td>
                                 <td style="display:none;" >{{ value.parent_id }}</td>
                                 <td style="display:none;" >{{ value.opening_balance }}</td>
                                 <td style="display:none;" >{{ value.phone_no }}</td>

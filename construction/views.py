@@ -63,52 +63,52 @@ def addCategory(request):
     return render(request, 'construction/add-category.html',{'title':'Categories', 'category':categories})
 
 
-@login_required
-def addProject(request):
-    chartofaccount = ChartOfAccount.objects.all()
-    users = User.objects.all()
-    itemCategory = Category.objects.all()
-    if request.method == "POST":
-        projName = request.POST.get("projectName")
-        Amount = request.POST.get("amount")
-        description = request.POST.get("narration")
-        payment_method = request.POST.get("payMethod")
-        Client = request.POST.get("client")
-        # ItemCategory = request.POST.get("item-category")
-        # ItemName = request.POST.get("item-Name")
-        # ItemQuantity = request.POST.get("item-Quantity")
-        # UnitPrice = request.POST.get("unit-Price")
+# @login_required
+# def addProject(request):
+#     chartofaccount = ChartOfAccount.objects.all()
+#     users = User.objects.all()
+#     itemCategory = Category.objects.all()
+#     if request.method == "POST":
+#         projName = request.POST.get("projectName")
+#         Amount = request.POST.get("amount")
+#         description = request.POST.get("narration")
+#         payment_method = request.POST.get("payMethod")
+#         Client = request.POST.get("client")
+#         # ItemCategory = request.POST.get("item-category")
+#         # ItemName = request.POST.get("item-Name")
+#         # ItemQuantity = request.POST.get("item-Quantity")
+#         # UnitPrice = request.POST.get("unit-Price")
 
-        proj = Project(projectName=projName,  userId=request.user, amount=Amount, narration=description, payMethod=payment_method, accountId=ChartOfAccount.objects.get(accountId=Client))
-        proj.save()
+#         proj = Project(projectName=projName,  userId=request.user, amount=Amount, narration=description, payMethod=payment_method, accountId=ChartOfAccount.objects.get(accountId=Client))
+#         proj.save()
 
-        proj = Project.objects.last()
-        print(proj)
-        # itemName = request.POST.get("ItemName")
-        # itemCategory = request.POST.get("ItemCategory")
-        # itemQuantity = request.POST.get("ItemQuantity")
-        # unitPrice = request.POST.get("UnitPrice")
-        # unit = request.POST.get("Unit")
+#         proj = Project.objects.last()
+#         print(proj)
+#         # itemName = request.POST.get("ItemName")
+#         # itemCategory = request.POST.get("ItemCategory")
+#         # itemQuantity = request.POST.get("ItemQuantity")
+#         # unitPrice = request.POST.get("UnitPrice")
+#         # unit = request.POST.get("Unit")
 
-        items = json.loads(request.POST.get('items'))
+#         items = json.loads(request.POST.get('items'))
 
-        print(items, "\n", projName, Amount, description, payment_method, Client)
-        for item in items:
-            print(item)
-            itemName = item['ItemName']
-            itemCategory = Category.objects.get(categoryId =item['ItemCategoryVal'])
-            itemQuantity = item['ItemQuantity']
-            unitPrice = item['UnitPrice']
-            unit = item['Unit']
-            item_add = Inventory(itemName = itemName, itemCategory=itemCategory, itemQuantity= itemQuantity, unitPrice=unitPrice,unit=unit, projectId = proj, userId=request.user)
-            item_add.save()
+#         print(items, "\n", projName, Amount, description, payment_method, Client)
+#         for item in items:
+#             print(item)
+#             itemName = item['ItemName']
+#             itemCategory = Category.objects.get(categoryId =item['ItemCategoryVal'])
+#             itemQuantity = item['ItemQuantity']
+#             unitPrice = item['UnitPrice']
+#             unit = item['Unit']
+#             item_add = Inventory(itemName = itemName, itemCategory=itemCategory, itemQuantity= itemQuantity, unitPrice=unitPrice,unit=unit, projectId = proj, userId=request.user)
+#             item_add.save()
 
-        return JsonResponse({'success':'success'})
+#         return JsonResponse({'success':'success'})
 
 
 
-        # print(projName, Amount, description, payment_method, CLient)
-    return render(request, 'construction/add-project.html',{'title':'Add Project','users':users,'category':itemCategory,'accounts':chartofaccount})
+#         # print(projName, Amount, description, payment_method, CLient)
+#     return render(request, 'construction/add-project.html',{'title':'Add Project','users':users,'category':itemCategory,'accounts':chartofaccount})
 
 # class InventoryDelete(LoginRequiredMixin, DeleteView):
 #     model = Inventory
@@ -168,7 +168,7 @@ def inventory(request):
 
 
 
-    return render(request, 'construction/inventory.html',{'title':'Inventory','inventories':inventory,'category':category,'projects':projects})
+    return render(request, 'construction/inventory.html',{'title':'Inventory','inventories':inventory[::-1],'category':category,'projects':projects})
 
 @login_required
 def chart_of_account(request):
@@ -349,7 +349,7 @@ def project(request):
             p.projectName = ProjectName
             p.narration = Description
             p.save()
-    return render(request, 'construction/project.html',{'title':'Projects','projects':project,'chartofaccounts':chartofaccount, 'get_last_tran_id':get_last_tran_id})
+    return render(request, 'construction/project.html',{'title':'Projects','projects':project[::-1],'chartofaccounts':chartofaccount, 'get_last_tran_id':get_last_tran_id})
 
 @login_required
 def delete_project(request, pk):

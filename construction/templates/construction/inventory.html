@@ -12,33 +12,38 @@
           </div>
         </div>
     </div>
-      <h4>Inventory</h4>
+      <h3>Inventory</h3>
     <div class="table table-responsive">
-        <table class="table table-bordered sort" id='dataTable'>
+        <table class="table table-bordered sort" id="dataTable">
+          <thead>
                 <tr>
-                    <th width="100px">S NO.</th>
-                    <th style='display: none;'>inv id</th>
-                    <th>Item Name</th>
-                    <th>Item Category</th>
-                    <th>Item Quantity</th>
-                    <th>Project</th>
-                    <th>Unit Price</th>
-                    <th>Unit</th>
-                    <th width="200px">Action</th>
+                    <th width="70px" style=" font-size: 14px;">S NO.</th>
+                    <th style='display: none; font-size: 14px;' >inv id</th>
+                    <th style=" font-size: 14px; width: 250px;">Item Name</th>
+                    <th style=" font-size: 14px; width: 200px;">Item Category</th>
+                    <th style=" font-size: 14px; width: 150px;">Item Quantity</th>
+                    <th style=" font-size: 14px;">Project</th>
+                    <th style=" font-size: 14px;">Unit Price</th>
+                    <th style=" font-size: 14px; width: 100px;">Unit</th>
+                    <th width="5%" style=" font-size: 14px;">Action</th>
                 </tr>
+          </thead>
+          <tbody>
                 {% for inventory in inventories %}
                   <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td style="display: none;">{{ inventory.itemId }}</td>
-                    <td>{{ inventory.itemName }}</td>
-                    <td>{{ inventory.itemCategory }}</td>
-                    <td>{{ inventory.itemQuantity }}</td>
-                    <td>{{ inventory.projectId }}</td>
-                    <td>{{ inventory.unitPrice }}</td>
-                    <td>{{ inventory.unit }}</td>
-                    <td><a data-toggle="modal" data-target="#updateInventoryModal" id='editInventoryButton'><button class="btn"><i class="fas fa-pencil-alt" style="color: #ffcc00"></i></button></a></td>
+                    <td style=" font-size: 14px;">{{ forloop.counter }}</td>
+                    <td style="display: none; font-size: 14px;">{{ inventory.itemId }}</td>
+                    <td style=" font-size: 14px;">{{ inventory.itemName }}</td>
+                    <td style=" font-size: 14px;">{{ inventory.itemCategory }}</td>
+                    <td style=" font-size: 14px;">{{ inventory.itemQuantity }}</td>
+                    <td style=" font-size: 14px;">{{ inventory.projectId }}</td>
+                    <td style=" font-size: 14px;">{{ inventory.unitPrice }}</td>
+                    <td style=" font-size: 14px;">{{ inventory.unit }}</td>
+                    <td width="5%" style=" font-size: 14px;"><a data-toggle="modal" data-target="#updateInventoryModal" id='editInventoryButton'><button class="btn"><i class="fas fa-pencil-alt" style="color: #ffcc00"></i></button></a></td>
                   </tr>
                 {% endfor %}
+          </tbody>
+
         </table>
     </div>
 
@@ -270,5 +275,9 @@
           
         console.log($("#item-id").val());
      });
+
+     $(document).ready( function () {
+    $('#dataTable').DataTable();
+} );
           </script>
 {% endblock %}

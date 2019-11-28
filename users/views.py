@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import UserRegisterForm
+from .forms import (UserRegisterForm, UserUpdateForm, ProfileUpdateForm)
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
+from . import models
 
 # Create your views here.
 
@@ -17,6 +18,8 @@ def register(request):
             form.save()
             # username = form.cleaned_data.get('username')
             messages.success(request, f'Your Account has been created! now you can login to your account')
+            c = models.Profile(user = User.objects.all().last())
+            c.save()
             return redirect('user-list')
     else:
         form = UserRegisterForm()
@@ -52,3 +55,23 @@ def delete_user_roles(request,pk):
         User.objects.filter(id= pk).all().delete()
         messages.add_message(request, messages.SUCCESS, "User Deleted.")
     return redirect('user-list')
+
+@login_required
+def profile(request):
+    if request.method == "POST":
+        u_form = UserUpdateForm(request.POST, instance=request.user)
+        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+        if u_form.is_valid() and p_form.is_valid():
+            u_form.save()
+            p_form.save()
+            messages.success(request, f'Your account has been updated!')
+            return redirect('Profile')
+    else:
+        u_form = UserUpdateForm(instance=request.user)
+        p_form = ProfileUpdateForm(instance=request.user.profile)
+    context = {
+        'u_form': u_form,
+        'p_form': p_form
+    }
+
+    return render(request, 'users/profile.html', context)

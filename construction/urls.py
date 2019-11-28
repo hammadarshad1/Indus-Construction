@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import (home, addProject, addCategory, inventory, chart_of_account, project, delete_project,
+from .views import (home, addCategory, inventory, chart_of_account, project, delete_project,
 delete_inventory_category, delete_inventory,
  journal_voucher, journal_voucher_new, delete_journal_voucher, cash_receiving_voucher, cash_receiving_voucher_new,
  bank_receiving_voucher, bank_receiving_voucher_new, edit_chart_of_account, delete_chart_of_account, cash_payment_voucher,
@@ -11,7 +11,6 @@ delete_inventory_category, delete_inventory,
 urlpatterns = [
     path('', home, name='Home'),
     # path('inventory/add',views.addInventory,name='Add-Inventory')
-    path('projects/add', addProject, name='Add-Project'),
     path('inventory/category',addCategory,name='Add-Category'),
     path('inventory/',inventory,name='Inventory'),
     path('projects/',project,name='Project'),

@@ -7,7 +7,8 @@
     </div>
       <h4>Main Category</h4>
     <div class="table table-responsive">
-        <table class="table table-bordered sort" id='dataTable-category'>
+        <table class="table table-bordered sort" id='dataTable'>
+          <thead>
                 <tr>
                     <th width="100px">S NO.</th>
                     <th>Category Title</th>
@@ -15,6 +16,8 @@
                     <th>User</th>
                     <th width="200px">Action</th>
                 </tr>
+          </thead>
+          <tbody>
                 {% for cat in category %}
                   <tr>
                     <td>{{ forloop.counter }}</td>
@@ -24,6 +27,7 @@
                     <td><a data-toggle="modal" data-target="#updateCategoryModal" id='editCategoryButton'><button class="btn"><i class="fas fa-pencil-alt" style="color: #ffcc00"></i></button></a><a data-toggle="modal" data-target="#deleteCatModal" id="{{cat.categoryId}}" class="delete-inventory-category"><button class="btn"><i class="fa fa-trash" style="color:#ff1a1a;"></i></button></a></td>
                   </tr>
                 {% endfor %}
+          </tbody>
         </table>
     </div>
 
@@ -120,13 +124,13 @@
                $("#modal_delete_button").attr("href", `/inventory/category/delete/${this.id}`);
            })
 
-           $("#dataTable-category tbody").on('click','#editCategoryButton', function(){
+           $("#dataTable tbody").on('click','#editCategoryButton', function(){
                var tr = $(this).closest('tr');
                var categoryName = tr.find('td:eq(1)').text();
                var categoryId = tr.find('td:eq(2)').text();
-               console.log(categoryName, categoryId)
+               console.log(categoryName, categoryId);
                $("#categoryNameUpdate").val(categoryName);
-               $("#categoryIdUpdate").val(categoryId)
+               $("#categoryIdUpdate").val(categoryId);
            })
 
             </script>

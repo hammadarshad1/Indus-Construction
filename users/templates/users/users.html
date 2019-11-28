@@ -15,34 +15,34 @@
     </div>
     <br>
     <div class="table table-responsive">
-      <table class="table table-bordered sort" id="dataTable-user">
+      <table class="table table-bordered sort" id="dataTable">
           <thead>
               <tr>
-                  <th width="60px">S NO.</th>
-                  <th width="150px">First Name</th>
-                  <th width="150px">Last Name</th>
-                  <th width="150px">User Name</th>
-                  <th width="150px">Email</th>
-                  <th width="150px">Status</th>
-                  <th width="100px">Date Joined</th>
+                  <th width="5%" style=" font-size: 14px;">S NO.</th>
+                  <th width="120px" style=" font-size: 14px;">First Name</th>
+                  <th width="120px" style=" font-size: 14px;">Last Name</th>
+                  <th width="100px" style=" font-size: 14px;">User Name</th>
+                  <th width="16%" style=" font-size: 14px;">Email</th>
+                  <th width="50px" style=" font-size: 14px;">Status</th>
+                  <th width="100px" style=" font-size: 14px;">Date Joined</th>
                   <th style="display:none;">id</th>
-                  <td>Action</td>
+                  <th style=" font-size: 14px;">Action</th>
               </tr>
           </thead>
           <tbody>
             {% for row in all_user %}
             <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ row.first_name }}</td>
-                <td>{{row.last_name}}</td>
-                <td>{{ row.username }}</td>
-                <td>{{ row.email }}</td>
+                <td style=" font-size: 14px;">{{ forloop.counter }}</td>
+                <td style=" font-size: 14px;">{{ row.first_name }}</td>
+                <td style=" font-size: 14px;">{{row.last_name}}</td>
+                <td style=" font-size: 14px;">{{ row.username }}</td>
+                <td style=" font-size: 14px;">{{ row.email }}</td>
                 {% if row.is_active == 1 %}
-                  <td>Active</td>
+                  <td style=" font-size: 14px;"></tdstyle> Active</td>
                 {% else %}
-                  <td>Deactive</td>
+                  <td style=" font-size: 14px;">Deactive</td>
                 {% endif %}
-                <td>{{ row.date_joined }}</td>
+                <td style=" font-size: 14px;">{{ row.date_joined }}</td>
                 <td style="display:none;">{{ row.id }}</td>
                 <td width='100px'>
                       <a class="edit_list" href="#" data-toggle="modal" data-target="#updateUserModal"><i class="fas fa-pencil-alt" style="color:#e6e600;"></i></a>
@@ -135,7 +135,7 @@
    $("#modal_delete_button").attr("href", `users/delete/${this.id}`);
  })
 
- $("#dataTable-user tbody").on('click','.edit_list', function(){
+ $("#dataTable tbody").on('click','.edit_list', function(){
      var tr = $(this).closest('tr');
      var firstName = tr.find('td:eq(1)').text();
      var lastName = tr.find('td:eq(2)').text();

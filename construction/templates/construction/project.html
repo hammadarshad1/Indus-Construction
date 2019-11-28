@@ -1,10 +1,11 @@
 {% extends 'construction/base.html' %}
 {% block content %}
-        <div class="input-group">
-        <div class="col-md-12">
-          <a role="button" href="" style="float:right;" class="btn btn-outline-secondary" name="button" data-toggle="modal" data-target="#addProjectModal"><i class="fas fa-plus"></i> Add New</a>
-        </div>
-        <!-- <div class="col-md-2">
+<div class="input-group">
+  <div class="col-md-12">
+    <a role="button" href="" style="float:right;" class="btn btn-outline-secondary" name="button" data-toggle="modal"
+      data-target="#addProjectModal"><i class="fas fa-plus"></i> Add New</a>
+  </div>
+  <!-- <div class="col-md-2">
             <div class="form-group col-md-12">
                 <label for="">Customer</label>
                 <select class="form-control form-control-sm main_drop" id="customerCheck" name="customerCheck">
@@ -22,69 +23,80 @@
             </select>
           </div>
         </div> -->
-    </div>
-      <h4>Projects</h4>
-    <div class="table table-responsive">
-        <table class="table table-bordered sort" id='dataTable'>
-                <tr>
-                    <th width="10px">S NO.</th>
-                    <th style='display: none;'>proj id</th>
-                    <th>Customer</th>
-                    <th>Project Name</th>
-                    <th>user</th>
-                    <th>Date</th>
-                    <th>Description</th>
-                    <th width="200px">Action</th>
-                </tr>
-                {% for project in projects %}
-                  <tr>
-                    <td width="10px">{{ forloop.counter }}</td>
-                    <td style="display: none;" id=inventoryId>{{ project.projectId }}</td>
-                    <td>{{ project.accountId }}</td>
-                    <td value='{{ project.accountId.accountId }}'>{{ project.projectName }}</td>
-                    <td>{{ project.userId }}</td>
-                    <td>{{ project.projectDate }}</td>
-                    <td>{{ project.narration }}</td>
-                    <td><a data-toggle="modal" data-target="#updateProjectModal" id='editProjectButton'><button class="btn"><i class="fas fa-pencil-alt" style="color: #ffcc00"></i></button></a><a class="delete-project" href='#' data-toggle="modal" data-target="#deleteCoaModal" id="{{project.projectId}}"><button class="btn" id='inventoryDeleteButton'><i class="fa fa-trash" style="color:#ff1a1a;"></i></button></a></td>
-                  </tr>
+</div>
+<h4>Projects</h4>
+<div class="table table-responsive">
+  <table class="table table-bordered sort" id='dataTable'>
+    <thead>
+      <tr>
+        <th style="width: 5%; font-size: 14px;">S NO.</th>
+        <th style='display: none;'>proj id</th>
+        <th width='250px' style=" font-size: 14px;">Customer</th>
+        <th width='400px' style=" font-size: 14px;">Project Name</th>
+        <th width='100px' style=" font-size: 14px;">user</th>
+        <th style=" font-size: 14px;width: 140px;">Date</th>
+        <th style=" font-size: 14px;">Description</th>
+        <th width="150px" style=" font-size: 14px;">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for project in projects %}
+          <tr>
+            <td style=" font-size: 14px;">{{ forloop.counter }}</td>
+            <td style="display: none;" id=inventoryId>{{ project.projectId }}</td>
+            <td style=" font-size: 14px;">{{ project.accountId }}</td>
+            <td value='{{ project.accountId.accountId }}' style=" font-size: 14px;">{{ project.projectName }}</td>
+            <td style=" font-size: 14px;">{{ project.userId }}</td>
+            <td style=" font-size: 14px;">{{ project.projectDate }}</td>
+            <td style=" font-size: 14px;">{{ project.narration }}</td>
+            <td style=" font-size: 14px;"><a data-toggle="modal" data-target="#updateProjectModal"
+                id='editProjectButton'><button class="btn"><i class="fas fa-pencil-alt"
+                    style="color: #ffcc00"></i></button></a><a class="delete-project" href='#' data-toggle="modal"
+                data-target="#deleteCoaModal" id="{{project.projectId}}"><button class="btn" id='inventoryDeleteButton'><i
+                    class="fa fa-trash" style="color:#ff1a1a;"></i></button></a></td>
+          </tr>
+        {% endfor %}
+    </tbody>
+
+  </table>
+</div>
+
+<div class="modal fade" id="addProjectModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Add Project</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <!-- Modal body -->
+      <form action="{% url 'Project' %}" method="POST" autocomplete="off" id='add-inventory-form'>
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              <label for="">Project Id</label>
+              <input type="text" readonly class="form-control form-control-sm" required value="{{ get_last_tran_id }}"
+                id="tran_id">
+            </div>
+            <div class="form-group col-md-12">
+              <label for="">Project Name</label>
+              <input type="hidden" class="form-control form-control-sm" value='new-project'
+                name='project-edit-or-delete'>
+              <input type="text" class="form-control form-control-sm" id="projectName" name="projectName">
+            </div>
+            <div class="form-group col-md-12">
+              <label for="">Customer</label>
+              <select class="form-control form-control-sm main_drop" id="customer" name="customer">
+                <option value="">Select:</option>
+                {% for chartofaccount in chartofaccounts %}
+                <option value="{{ chartofaccount.id }}">{{ chartofaccount.account_title }}</option>
                 {% endfor %}
-        </table>
-    </div>
-
-    <div class="modal fade" id="addProjectModal">
-        <div class="modal-dialog">
-          <div class="modal-content">
-
-                <!-- Modal Header -->
-                <div class="modal-header">
-                  <h4 class="modal-title">Add Project</h4>
-                  <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-
-                <!-- Modal body -->
-                <form action="{% url 'Project' %}" method="POST"  autocomplete="off" id='add-inventory-form'>
-                    {% csrf_token %}
-                     <div class="modal-body">
-                         <div class="form-row">
-                            <div class="form-group col-md-12">
-                                <label for="">Project Id</label>
-                                <input type="text" readonly class="form-control form-control-sm" required value="{{ get_last_tran_id }}" id="tran_id">
-                              </div>
-                           <div class="form-group col-md-12">
-                             <label for="">Project Name</label>
-                             <input type="hidden"  class="form-control form-control-sm" value='new-project' name='project-edit-or-delete'>
-                             <input type="text"  class="form-control form-control-sm" id="projectName" name="projectName">
-                           </div>
-                           <div class="form-group col-md-12">
-                          <label for="">Customer</label>
-                          <select class="form-control form-control-sm main_drop" id="customer" name="customer">
-                            <option value="">Select:</option>
-                            {% for chartofaccount in chartofaccounts %}
-                                <option value="{{ chartofaccount.id }}">{{ chartofaccount.account_title }}</option>
-                            {% endfor %}
-                          </select>
-                        </div>
-                           <!-- <div class="form-group col-md-12">
+              </select>
+            </div>
+            <!-- <div class="form-group col-md-12">
                           <label for="">Payment Method</label>
                           <select class="form-control form-control-sm main_drop" id="payMethod" name="payMethod">
                             <option value="">Select:</option>
@@ -92,62 +104,64 @@
                             <option value="Credit">Credit</option>
                           </select>
                         </div> -->
-                        <div class="form-group col-md-12">
-                            <label for="">Amount</label>
-                            <input type="number"  class="form-control form-control-sm" id="amount" name="amount">
-                          </div>
-                            <div class="form-group col-md-12">
-                             <label for="">Description</label>
-                             <textarea name="description" id="description" rows="1" cols="44"></textarea>
-                             <!-- <input type="text"  class="form-control form-control-sm" id="description" name="description"> -->
-                       </div>
-                          </div>
-                     </div>
-                   <!-- Modal footer -->
-                   <div class="modal-footer">
-                     <input type="submit" class="btn btn-success" value="Submit" >
-                   </div>
-                 </form>
-
-              <!-- <form class="" action="index.html" method="post">
-              </form> -->
+            <div class="form-group col-md-12">
+              <label for="">Amount</label>
+              <input type="number" class="form-control form-control-sm" id="amount" name="amount">
+            </div>
+            <div class="form-group col-md-12">
+              <label for="">Description</label>
+              <textarea name="description" id="description" rows="1" cols="44"></textarea>
+              <!-- <input type="text"  class="form-control form-control-sm" id="description" name="description"> -->
+            </div>
           </div>
         </div>
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <input type="submit" class="btn btn-success" value="Submit">
+        </div>
+      </form>
+
+      <!-- <form class="" action="index.html" method="post">
+              </form> -->
     </div>
+  </div>
+</div>
 
 
-    <div class="modal fade" id="updateProjectModal">
-        <div class="modal-dialog">
-          <div class="modal-content">
+<div class="modal fade" id="updateProjectModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
 
-                <!-- Modal Header -->
-                <div class="modal-header">
-                  <h4 class="modal-title">Update Project</h4>
-                  <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Update Project</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
 
-                <!-- Modal body -->
-                <form action="{% url 'Project' %}" method="POST"  autocomplete="off">
-                    {% csrf_token %}
-                     <div class="modal-body">
-                         <div class="form-row">
-                           <div class="form-group col-md-12">
-                             <label for="">Project Name</label>
-                              <input type="hidden"  class="form-control form-control-sm" value='edit-project' name='project-edit-or-delete'>
-                              <input type='text' style='display:none;' class="form-control form-control-sm" name='projectIdUpdate' id='projectIdUpdate'>
-                             <input type="text"  class="form-control form-control-sm" id="projectNameUpdate" name="projectNameUpdate">
-                           </div>
-                           <div class="form-group col-md-12">
-                            <input type="hidden"  class="form-control form-control-sm" value="" name='customer-id' id='customer-id'>
-                          <label for="">Customer</label>
-                          <select class="form-control form-control-sm main_drop" id="customerUpdate" name="customerUpdate">
-                            <option value="">Select:</option>
-                            {% for chartofaccount in chartofaccounts %}
-                                <option value="{{ chartofaccount.id }}">{{ chartofaccount.account_title }}</option>
-                            {% endfor %}
-                          </select>
-                        </div>
-                           <!-- <div class="form-group col-md-12">
+      <!-- Modal body -->
+      <form action="{% url 'Project' %}" method="POST" autocomplete="off">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              <label for="">Project Name</label>
+              <input type="hidden" class="form-control form-control-sm" value='edit-project'
+                name='project-edit-or-delete'>
+              <input type='text' style='display:none;' class="form-control form-control-sm" name='projectIdUpdate'
+                id='projectIdUpdate'>
+              <input type="text" class="form-control form-control-sm" id="projectNameUpdate" name="projectNameUpdate">
+            </div>
+            <div class="form-group col-md-12">
+              <input type="hidden" class="form-control form-control-sm" value="" name='customer-id' id='customer-id'>
+              <label for="">Customer</label>
+              <select class="form-control form-control-sm main_drop" id="customerUpdate" name="customerUpdate">
+                <option value="">Select:</option>
+                {% for chartofaccount in chartofaccounts %}
+                <option value="{{ chartofaccount.id }}">{{ chartofaccount.account_title }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <!-- <div class="form-group col-md-12">
                           <label for="">Payment Method</label>
                           <select class="form-control form-control-sm main_drop" id="payMethodUpdate" name="payMethodUpdate">
                             <option value="">Select:</option>
@@ -155,118 +169,120 @@
                             <option value="Credit">Credit</option>
                           </select>
                         </div> -->
-                            <div class="form-group col-md-12">
-                             <label for="">Description</label>
-                             <textarea name="descriptionUpdate" id="descriptionUpdate" rows="1" cols="44"></textarea>
-                             <!-- <input type="text"  class="form-control form-control-sm" id="descriptionUpdate" name="descriptionUpdate"> -->
-                           </div>
-                          </div>
-                     </div>
-                   <!-- Modal footer -->
-                   <div class="modal-footer">
-                     <input type="submit" class="btn btn-success" value="Submit" id='submitUdpateProject'>
-                   </div>
-                 </form>
-
-              <!-- <form class="" action="index.html" method="post">
-              </form> -->
-          </div>
-        </div>
-    </div>
-
-<!-- Delete Modal-->
-        <div class="modal fade" id="deleteCoaModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Delete Project</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">×</span>
-                </button>
-              </div>
-              <div class="modal-body">Are you sure you want to delete?</div>
-              <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-danger" href="" id="modal_delete_button">Delete</a>
-              </div>
+            <div class="form-group col-md-12">
+              <label for="">Description</label>
+              <textarea name="descriptionUpdate" id="descriptionUpdate" rows="1" cols="44"></textarea>
+              <!-- <input type="text"  class="form-control form-control-sm" id="descriptionUpdate" name="descriptionUpdate"> -->
             </div>
           </div>
         </div>
-          <!-- Modal -->
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <input type="submit" class="btn btn-success" value="Submit" id='submitUdpateProject'>
+        </div>
+      </form>
 
-    <script>
+      <!-- <form class="" action="index.html" method="post">
+              </form> -->
+    </div>
+  </div>
+</div>
 
-function getCookie(c_name)
-{
-if (document.cookie.length > 0)
-{
-    c_start = document.cookie.indexOf(c_name + "=");
-    if (c_start != -1)
-    {
+<!-- Delete Modal-->
+<div class="modal fade" id="deleteCoaModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Delete Project</h5>
+        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">Are you sure you want to delete?</div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <a class="btn btn-danger" href="" id="modal_delete_button">Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal -->
+
+<script>
+
+  function getCookie(c_name) {
+    if (document.cookie.length > 0) {
+      c_start = document.cookie.indexOf(c_name + "=");
+      if (c_start != -1) {
         c_start = c_start + c_name.length + 1;
         c_end = document.cookie.indexOf(";", c_start);
         if (c_end == -1) c_end = document.cookie.length;
-        return unescape(document.cookie.substring(c_start,c_end));
-    }
-}
-return "";
-}
-
-        $("#dataTable tbody").on('click','#editProjectButton', function(){
-            var tr = $(this).closest('tr');
-            var projectName = tr.find('td:eq(2)').text();
-            var customer = tr.find('td:eq(3)').text();
-            var paymentMethod = tr.find('td:eq(6)').val();
-            var description = tr.find('td:eq(6)').text();
-            var projectID = tr.find('td:eq(1)').text();
-            // if (paymentMethod == 'Credit'){
-            //     paymentMethod = 1
-            // }
-            // else {
-            //     paymentMethod = 2
-            // }
-            $("#projectNameUpdate").val(projectName)
-            $("#customerUpdate option:selected").text(customer)
-            // $("#payMethodUpdate").prop('selectedIndex',paymentMethod)
-            $("#customer-id").val(customer)
-            $("#descriptionUpdate").val(description);
-            $("#projectIdUpdate").val(projectID);
-            console.log(description);
-        })
-
-        $(".delete-project").on('click',function(){
-         $("#modal_delete_button").attr("href", `/project/delete/${this.id}`);
-     })
-
-     $("#customerUpdate").on('change',function(){
-        $("#customer-id").attr('value', $("#customerUpdate option:selected").text())
-     });
-    
-
-     $("#customerCheck").on('change', function(){
-      main_object_id = this.value;
-    console.log(main_object_id);
-    req =	$.ajax({
-     headers: { "X-CSRFToken": getCookie("csrftoken") },
-     type: 'POST',
-     url : '/projects/',
-     data:{
-       'main_object_id':main_object_id ,
-       'samp':"projectCheck",
-     },
-     dataType: 'json'
-    })
-    .done(function done(data) {
-      sub_menu = JSON.parse(data.sub_menu);
-      $('#projectCheck').empty()
-      $('#projectCheck').append($("<option></option>").attr("value",3).text("General"));
-      for (var i = 0; i < sub_menu.length; i++) {
-          $('#projectCheck').append($("<option></option>").attr("value",sub_menu[i].pk).text(sub_menu[i].fields["projectName"]));
-          console.log(sub_menu[i].pk);
+        return unescape(document.cookie.substring(c_start, c_end));
       }
+    }
+    return "";
+  }
 
-    })
+  $("#dataTable tbody").on('click', '#editProjectButton', function () {
+    var tr = $(this).closest('tr');
+    var projectName = tr.find('td:eq(2)').text();
+    var customer = tr.find('td:eq(3)').text();
+    var paymentMethod = tr.find('td:eq(6)').val();
+    var description = tr.find('td:eq(6)').text();
+    var projectID = tr.find('td:eq(1)').text();
+    // if (paymentMethod == 'Credit'){
+    //     paymentMethod = 1
+    // }
+    // else {
+    //     paymentMethod = 2
+    // }
+    $("#projectNameUpdate").val(projectName)
+    $("#customerUpdate option:selected").text(customer)
+    // $("#payMethodUpdate").prop('selectedIndex',paymentMethod)
+    $("#customer-id").val(customer)
+    $("#descriptionUpdate").val(description);
+    $("#projectIdUpdate").val(projectID);
+    console.log(description);
+  })
+
+  $(".delete-project").on('click', function () {
+    $("#modal_delete_button").attr("href", `/project/delete/${this.id}`);
+  })
+
+  $("#customerUpdate").on('change', function () {
+    $("#customer-id").attr('value', $("#customerUpdate option:selected").text())
   });
-    </script>
+
+
+  $("#customerCheck").on('change', function () {
+    main_object_id = this.value;
+    console.log(main_object_id);
+    req = $.ajax({
+      headers: { "X-CSRFToken": getCookie("csrftoken") },
+      type: 'POST',
+      url: '/projects/',
+      data: {
+        'main_object_id': main_object_id,
+        'samp': "projectCheck",
+      },
+      dataType: 'json'
+    })
+      .done(function done(data) {
+        sub_menu = JSON.parse(data.sub_menu);
+        $('#projectCheck').empty()
+        $('#projectCheck').append($("<option></option>").attr("value", 3).text("General"));
+        for (var i = 0; i < sub_menu.length; i++) {
+          $('#projectCheck').append($("<option></option>").attr("value", sub_menu[i].pk).text(sub_menu[i].fields["projectName"]));
+          console.log(sub_menu[i].pk);
+        }
+
+      })
+  });
+
+
+
+
+</script>
 
 {% endblock %}
