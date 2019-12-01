@@ -40,6 +40,9 @@ class Project(models.Model):
     userId = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
     narration = models.TextField()
     projectDate = models.DateField(default = datetime.date.today)
+    startDate = models.DateField(max_length = datetime.date.today, blank=True, null=True)
+    endDate = models.DateField(max_length = datetime.date.today, blank=True, null=True)
+    projectStatus = models.CharField(max_length=20)
     payMethod = models.CharField(max_length = 10)
     projectCode = models.CharField(max_length=100)
 
@@ -68,6 +71,7 @@ class PurchaseHeader(models.Model):
     accountId = models.ForeignKey(ChartOfAccount, on_delete = models.CASCADE)
     userId = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
     projectId = models.ForeignKey(Project, on_delete = models.CASCADE)
+    referenceNo = models.CharField(max_length=30)
     
 
     def __str__(self):

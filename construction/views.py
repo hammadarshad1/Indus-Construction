@@ -177,7 +177,8 @@ def chart_of_account(request):
     bank = Q(account_id = '300')
     main = ChartOfAccount.objects.all()
     sub_accounts = ChartOfAccount.objects.all()
-    all_accounts = ChartOfAccount.objects.filter(supplier|customer|bank).all()
+    all_accounts = ChartOfAccount.objects.all()
+    accounts = ChartOfAccount.objects.filter(~Q(parent_id=11)).all()
     if request.method == 'POST':
         account_title = request.POST.get('account_title')
         account_type = request.POST.get('account_type')
@@ -203,7 +204,7 @@ def chart_of_account(request):
             opening_balance = -abs(Decimal(opening_balance))
         coa = ChartOfAccount(account_title = account_title, parent_id = account_type, opening_balance = opening_balance, phone_no = phone_no, email_address = email_address, ntn = ntn, stn = stn, cnic = cnic ,Address = address, remarks = remarks, credit_limit=credit_limits, account_id = "100", user_id=request.user)
         coa.save()
-    return render(request, 'construction/chart_of_account.html',{'title':'Add Customer','all_accounts':all_accounts})
+    return render(request, 'construction/chart_of_account.html',{'title':'Add Customer','all_accounts':all_accounts, 'accounts':accounts})
 
 
 @login_required
@@ -298,19 +299,20 @@ def view_purchase_voucher(request, pk):
 
 @login_required
 def project(request):
-    project = Project.objects.all()
-    chartofaccount = ChartOfAccount.objects.all()
+    project = Project.objects.filter(~Q(projectName = 'General')).all()
+    chartofaccount = ChartOfAccount.objects.filter(Q(parent_id=12)).all()
     all_bank_accounts = ChartOfAccount.objects.filter(account_id = 100).all()
-    get_last_tran_id = VoucherHeader.objects.filter(voucherNo__contains='BPV').last()
     cof = ChartOfAccount.objects.all()
-    cursor = conn.cursor()
-    get_last_tran_id = cursor.execute('''select * from construction_project where projectCode LIKE "%PR%" order by projectCode DESC LIMIT 1 ''')
-    get_last_tran_id = cursor.fetchall()
+
+    get_last_tran_id = Project.objects.filter(Q(projectCode__contains = 'PR')).last()
+    #cursor = conn.cursor()
+    #get_last_tran_id = cursor.execute('''select * from construction_project where projectCode LIKE "%PR%" order by projectCode DESC LIMIT 1 ''')
+    #get_last_tran_id = cursor.fetchall()
     print(get_last_tran_id)
     date = datetime.date.today()
     date = date.strftime('%Y%m')
     if get_last_tran_id:
-        get_last_tran_id = get_last_tran_id[0][8]
+        get_last_tran_id = get_last_tran_id.projectCode
         get_last_tran_id = get_last_tran_id
         get_last_tran_id = get_last_tran_id[6:]
         print(get_last_tran_id)
@@ -319,7 +321,7 @@ def project(request):
         get_last_tran_id = str(get_last_tran_id)
         get_last_tran_id = date[2:] + 'PR' + get_last_tran_id
     else:
-        get_last_tran_id = date[2:]+'PR'
+        get_last_tran_id = date[2:]+'PR1'
     if request.method == "POST":
         project_edit_or_delete = request.POST.get('project-edit-or-delete')
         if project_edit_or_delete == "new-project":
@@ -328,8 +330,13 @@ def project(request):
             amount = request.POST.get('amount')
             PaymentMethod = 'Cash'
             Description = request.POST.get('description')
-            project_add = Project(projectName=ProjectName,projectCode=get_last_tran_id, accountId=ChartOfAccount(id=AccountId), payMethod=PaymentMethod, narration=Description, amount=float(amount), userId=request.user)
+            status = request.POST.get('status')
+            startDate = request.POST.get('startDate')
+            endDate = request.POST.get('endDate')
+            print(endDate, startDate, status)
+            project_add = Project(projectName=ProjectName,projectStatus=status, startDate=startDate, endDate=endDate, projectCode=get_last_tran_id, accountId=ChartOfAccount(id=AccountId), payMethod=PaymentMethod, narration=Description, amount=float(amount), userId=request.user)
             project_add.save()
+            return redirect('Project')
         elif request.POST.get('projectCheck'):
             main_object_id = request,POST.get('main_object_id')
             print(main_object_id)
@@ -342,13 +349,20 @@ def project(request):
             customerUpdate = request.POST.get('customer-id')
             ProjectName = request.POST.get('projectNameUpdate')
             Description = request.POST.get('descriptionUpdate')
+            startDate = request.POST.get('startDate-update')
+            endDate = request.POST.get('endDate-update')
+            status = request.POST.get('status-update')
             print(customerUpdate)
             account_id = ChartOfAccount.objects.get(account_title=customerUpdate)
             p = Project.objects.get(projectId=ProjectId)
             p.accountId = account_id
             p.projectName = ProjectName
             p.narration = Description
+            p.startDate = startDate
+            p.endDate = endDate
+            p.projectStatus = status
             p.save()
+            messages.success(request, 'Project Updated Successfully!')
     return render(request, 'construction/project.html',{'title':'Projects','projects':project[::-1],'chartofaccounts':chartofaccount, 'get_last_tran_id':get_last_tran_id})
 
 @login_required
@@ -1158,7 +1172,7 @@ def new_purchase(request):
     all_accounts = ChartOfAccount.objects.all()
     inv = Inventory.objects.all()
     cat = Category.objects.all()
-    sup = ChartOfAccount.objects.all()
+    sup = ChartOfAccount.objects.filter(Q(parent_id=13)).all()
     print(sup)
     get_last_tran_id = PurchaseHeader.objects.filter(purchaseNo__contains='PUR').last()
     date = datetime.date.today()
@@ -1188,13 +1202,14 @@ def new_purchase(request):
             project_pur = request.POST.get('Project')
             total = request.POST.get('grandTotal')
             stAmount = request.POST.get('stAmount')
+            referenceNo = request.POST.get('referenceNo')
             print(stAmount, project_pur)
             total = float(total)
             total = "{0:.2f}".format(total)
             # print(project_pur, total)
 
             cof = ChartOfAccount.objects.filter(id=17) 
-            p = PurchaseHeader(purchaseNo=get_last_tran_id, payment_method=PayMethod, details=Description, tax=float(stAmount), accountId= ChartOfAccount.objects.get(account_title=supplier), userId=request.user, projectId=Project.objects.get(projectId=project_pur))
+            p = PurchaseHeader(purchaseNo=get_last_tran_id,referenceNo=referenceNo, payment_method=PayMethod, details=Description, tax=float(stAmount), accountId= ChartOfAccount.objects.get(account_title=supplier), userId=request.user, projectId=Project.objects.get(projectId=project_pur))
             p.save()
             items = json.loads(request.POST.get('items'))
 

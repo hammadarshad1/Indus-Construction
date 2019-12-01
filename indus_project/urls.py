@@ -33,7 +33,10 @@ urlpatterns = [
     path('user_accounts', user_views.user_list, name='user-list'),
     path('users/delete/<pk>', user_views.delete_user_roles, name='delete-user-roles'),
     # path('inventory/<int:pk>/delete/',InventoryDelete,name='Inventory-Delete'),
-    path('users/Profile', user_views.profile, name='Profile')
+    path('users/Profile', user_views.profile, name='Profile'),
+    path('users/roles', user_views.user_roles, name = 'user-roles'),
+    path('roles/new', user_views.add_user_roles, name = 'add-user-roles'),
+    path('roles/edit/<id>', user_views.edit_user_roles, name = 'edit-user-roles'),
 ]
 
 if settings.DEBUG:

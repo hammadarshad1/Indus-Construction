@@ -1,0 +1,78 @@
+{% extends "construction/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>User Roles</h4>
+</div>
+<ul class="list-group list-group-flush">
+  <li class="list-group-item">
+    <div class="input-group">
+      <div class="col-md-12">
+        <a role="button" href="{% url 'add-user-roles' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
+      </div>
+    </div>
+    <ul style="list-style-type:none;" class="messages">
+      {% if messages %}
+        {% for msg in messages %}
+          <li>
+            <div class="alert {{msg.level_tag}}">
+              {{msg.message}}
+            </div>
+          </li>
+        {% endfor %}
+      {% endif %}
+    </ul>
+    <br>
+    <div class="table table-responsive content-loader">
+      <table class="table table-bordered sort" id="dataTable">
+          <thead>
+              <tr>
+                  <th width="100px">S NO.</th>
+                  <th >User Name</th>
+                  <th >Email Address</th>
+                  <th >Action</th>
+              </tr>
+          </thead>
+          <tbody>
+            {% for value in users %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><h6>{{ value.4 }}</h6></td>
+                <td>{{ value.7 }}</td>
+                <td>
+                  <a class="edit" href="{% url 'edit-user-roles' id=value.0 %}" data-toggle=""><i class="fas fa-pencil-alt" style="color: #ffcc00"></i></a>&nbsp;
+                  <a class="delete" href="" data-toggle="modal" data-target="#deleteDcModal" id="{{value.0}}"><i class="fa fa-trash" style="color:#ff1a1a;"></i></a>
+                </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+      </table>
+      <br>
+    </div>
+  </li>
+</ul>
+</div>
+<!-- Delete Modal-->
+<div class="modal fade" id="deleteDcModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Delete User</h5>
+        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">Are you sure you want to delete?</div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <a class="btn btn-danger" href="" id="modal_delete_button">Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- Modal -->
+
+
+{% endblock %}

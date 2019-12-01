@@ -16,6 +16,10 @@
           <input type="text" readonly class="form-control form-control-sm" required value="{{ get_last_tran_id }}" id="sale_id">
         </div>
         <div class="form-group col-md-2">
+            <label for="">Reference No</label>
+            <input type="text" class="form-control form-control-sm" required id="referenceNo">
+          </div>
+        <div class="form-group col-md-2">
           <label>Supplier Name</label>
           <select class="form-control form-control-sm" id="supplier_name_sale">
               <option value="">Select Account:</option>
@@ -25,7 +29,7 @@
           </select>
         </div>
         <div class="form-group col-md-2">
-          <label>Customer Name</label>
+          <label>Client Name</label>
           <select class="form-control form-control-sm" id="customer_name_sale">
               <option value="">Select Account:</option>
             {% for value in all_accounts %}
@@ -409,7 +413,8 @@ $("#new-sale-submit").on('submit',function(e){
                                     "grandTotal":$("#last_grand_total").val(),
                                     'items': JSON.stringify(data),
                                     'stAmount': $("#total_sales_tax").val(),
-                                    'supplier': $("#supplier_name_sale option:selected").text()
+                                    'supplier': $("#supplier_name_sale option:selected").text(),
+                                    'referenceNo':$("#referenceNo").val()
                                 },
                                 dataType: 'json'
                             })

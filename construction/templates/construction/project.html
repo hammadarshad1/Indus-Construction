@@ -31,12 +31,15 @@
       <tr>
         <th style="width: 5%; font-size: 14px;">S NO.</th>
         <th style='display: none;'>proj id</th>
-        <th width='250px' style=" font-size: 14px;">Customer</th>
-        <th width='400px' style=" font-size: 14px;">Project Name</th>
-        <th width='100px' style=" font-size: 14px;">user</th>
-        <th style=" font-size: 14px;width: 140px;">Date</th>
-        <th style=" font-size: 14px;">Description</th>
-        <th width="150px" style=" font-size: 14px;">Action</th>
+        <th style="width:10px;">Project Code</th>
+        <th width='250px' style=" font-size: 14px;">Client</th>
+        <th width='350px' style=" font-size: 14px;">Project Name</th>
+        <th width='50px' style=" font-size: 14px;">user</th>
+        <th style=" font-size: 14px;width: 100px;">Start Date</th>
+        <th style=" font-size: 14px;width: 100px;">End Date</th>
+        <th style="font-size: 14px;width: 100px">Status</th>
+        <th style=" font-size: 14px; width: 300px;">Description</th>
+        <th width="110px" style=" font-size: 14px;">Action</th>
       </tr>
     </thead>
     <tbody>
@@ -44,10 +47,13 @@
           <tr>
             <td style=" font-size: 14px;">{{ forloop.counter }}</td>
             <td style="display: none;" id=inventoryId>{{ project.projectId }}</td>
+            <td style="width:120px;">{{ project.projectCode }}</td>
             <td style=" font-size: 14px;">{{ project.accountId }}</td>
             <td value='{{ project.accountId.accountId }}' style=" font-size: 14px;">{{ project.projectName }}</td>
             <td style=" font-size: 14px;">{{ project.userId }}</td>
-            <td style=" font-size: 14px;">{{ project.projectDate }}</td>
+            <td style=" font-size: 14px;">{{ project.startDate|date:"Y-m-d" }}</td>
+            <td style=" font-size: 14px;">{{ project.endDate|date:"Y-m-d" }}</td>
+            <td style="font-size: 14px;">{{ project.projectStatus }}</td>
             <td style=" font-size: 14px;">{{ project.narration }}</td>
             <td style=" font-size: 14px;"><a data-toggle="modal" data-target="#updateProjectModal"
                 id='editProjectButton'><button class="btn"><i class="fas fa-pencil-alt"
@@ -76,26 +82,28 @@
         {% csrf_token %}
         <div class="modal-body">
           <div class="form-row">
+              
             <div class="form-group col-md-12">
-              <label for="">Project Id</label>
+              <label for="">Project Code</label>
               <input type="text" readonly class="form-control form-control-sm" required value="{{ get_last_tran_id }}"
                 id="tran_id">
             </div>
             <div class="form-group col-md-12">
+                <label for="">Client</label>
+                <select class="form-control form-control-sm main_drop" id="customer" name="customer" required>
+                  <option value="">Select:</option>
+                  {% for chartofaccount in chartofaccounts %}
+                  <option value="{{ chartofaccount.id }}">{{ chartofaccount.account_title }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            <div class="form-group col-md-12">
               <label for="">Project Name</label>
               <input type="hidden" class="form-control form-control-sm" value='new-project'
                 name='project-edit-or-delete'>
-              <input type="text" class="form-control form-control-sm" id="projectName" name="projectName">
+              <input type="text" class="form-control form-control-sm" id="projectName" name="projectName" required>
             </div>
-            <div class="form-group col-md-12">
-              <label for="">Customer</label>
-              <select class="form-control form-control-sm main_drop" id="customer" name="customer">
-                <option value="">Select:</option>
-                {% for chartofaccount in chartofaccounts %}
-                <option value="{{ chartofaccount.id }}">{{ chartofaccount.account_title }}</option>
-                {% endfor %}
-              </select>
-            </div>
+            
             <!-- <div class="form-group col-md-12">
                           <label for="">Payment Method</label>
                           <select class="form-control form-control-sm main_drop" id="payMethod" name="payMethod">
@@ -106,7 +114,25 @@
                         </div> -->
             <div class="form-group col-md-12">
               <label for="">Amount</label>
-              <input type="number" class="form-control form-control-sm" id="amount" name="amount">
+              <input type="number" class="form-control form-control-sm" id="amount" name="amount" required>
+            </div>
+            
+            <div class="form-group col-md-12">
+              <label for="">Start Date</label>
+              <input type="date"  class="form-control form-control-sm" id="startDate" name="startDate" required>
+            </div>
+            <div class="form-group col-md-12">
+              <label for="">End Date</label>
+              <input type="date"  class="form-control form-control-sm" id="endDate" name="endDate" required>
+            </div>
+            <div class="form-group col-md-12">
+              <label for="">Status</label>
+              <select class="form-control form-control-sm main_drop" id="status" name="status">
+                <option value="None">None</option>
+                <option value="On Going">On Going</option>
+                <option value="On Holding">On Holding</option>
+                <option value="Complete">Complete</option>
+              </select>
             </div>
             <div class="form-group col-md-12">
               <label for="">Description</label>
@@ -143,6 +169,16 @@
         {% csrf_token %}
         <div class="modal-body">
           <div class="form-row">
+              <div class="form-group col-md-12">
+                  <input type="hidden" class="form-control form-control-sm" value="" name='customer-id' id='customer-id'>
+                  <label for="">Client</label>
+                  <select class="form-control form-control-sm main_drop" id="customerUpdate" name="customerUpdate">
+                    <option value="">Select:</option>
+                    {% for chartofaccount in chartofaccounts %}
+                    <option value="{{ chartofaccount.id }}">{{ chartofaccount.account_title }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
             <div class="form-group col-md-12">
               <label for="">Project Name</label>
               <input type="hidden" class="form-control form-control-sm" value='edit-project'
@@ -151,14 +187,23 @@
                 id='projectIdUpdate'>
               <input type="text" class="form-control form-control-sm" id="projectNameUpdate" name="projectNameUpdate">
             </div>
+            
             <div class="form-group col-md-12">
-              <input type="hidden" class="form-control form-control-sm" value="" name='customer-id' id='customer-id'>
-              <label for="">Customer</label>
-              <select class="form-control form-control-sm main_drop" id="customerUpdate" name="customerUpdate">
-                <option value="">Select:</option>
-                {% for chartofaccount in chartofaccounts %}
-                <option value="{{ chartofaccount.id }}">{{ chartofaccount.account_title }}</option>
-                {% endfor %}
+              <label for="">Start Date</label>
+              <input type="date"  class="form-control form-control-sm" id="startDate-update" name="startDate-update" required>
+            </div>
+            <div class="form-group col-md-12">
+              <label for="">End Date</label>
+              <input type="date"  class="form-control form-control-sm" id="endDate-update" name="endDate-update" required>
+            </div>
+            <div class="form-group col-md-12">
+              <label for="">Status</label>
+              <select class="form-control form-control-sm main_drop" id="status-update" name="status-update">
+                <option value="">Select: </option>
+                <option value="None">None</option>
+                <option value="On Going">On Going</option>
+                <option value="On Holding">On Holding</option>
+                <option value="Complete">Complete</option>
               </select>
             </div>
             <!-- <div class="form-group col-md-12">
@@ -226,11 +271,14 @@
 
   $("#dataTable tbody").on('click', '#editProjectButton', function () {
     var tr = $(this).closest('tr');
-    var projectName = tr.find('td:eq(2)').text();
+    var projectName = tr.find('td:eq(4)').text();
     var customer = tr.find('td:eq(3)').text();
-    var paymentMethod = tr.find('td:eq(6)').val();
-    var description = tr.find('td:eq(6)').text();
-    var projectID = tr.find('td:eq(1)').text();
+    // var paymentMethod = tr.find('td:eq(6)').val();
+    var status = tr.find('td:eq(8)').text();
+    var description = tr.find('td:eq(9)').text();
+    var projectID = tr.find('td:eq(2)').text();
+    var StartDate = tr.find('td:eq(6)').text();
+    var EndDate = tr.find('td:eq(7)').text();
     // if (paymentMethod == 'Credit'){
     //     paymentMethod = 1
     // }
@@ -240,10 +288,13 @@
     $("#projectNameUpdate").val(projectName)
     $("#customerUpdate option:selected").text(customer)
     // $("#payMethodUpdate").prop('selectedIndex',paymentMethod)
-    $("#customer-id").val(customer)
+    $("#startDate-update").val(StartDate);
+    $("#endDate-update").val(EndDate);
+    $("#customer-id").val(customer);
     $("#descriptionUpdate").val(description);
     $("#projectIdUpdate").val(projectID);
-    console.log(description);
+    $('#status-update option:selected').text(status);
+    console.log(description, projectID, StartDate);
   })
 
   $(".delete-project").on('click', function () {

@@ -40,7 +40,7 @@
                               </tr>
                           </thead>
                           <tbody>
-                            {% for value in all_accounts %}
+                            {% for value in accounts %}
                             <tr>
                                 <td style=" font-size: 14px;">{{ forloop.counter }}</td>
                                 <td style="display:none; font-size: 14px;" >{{ value.id }}</td>
@@ -85,6 +85,7 @@
                 <label for="" class="col-sm-4 form-control-sm col-form-label">Account Type:</label>
                 <div class="col-sm-8">
                   <select class="form-control" name="account_type">
+                    <option value="11">Accounts</option>
                     <option value="12">Customer</option>
                     <option value="13">Supplier</option>
                     <option value="26">Cash at Bank</option>
@@ -198,6 +199,7 @@
                     <label for="" class="col-sm-4 form-control-sm col-form-label">Account Type:</label>
                     <div class="col-sm-4">
                       <select class="form-control" name="account_type" id="account_type">
+                        <option value="11">Accounts</option>
                         <option value="13">Customer</option>
                         <option value="12">Supplier</option>
                         <option value="26">Cash at Bank</option>
@@ -329,6 +331,7 @@
 			opening_balance = Math.abs(opening_balance);
 			$('#id').val(id);
 			$('#account_title').val(account_title);
+      $('#account_type option:selected').val(parent_type);
 			$('#opening_balance').val(opening_balance);
 			$('#phone_no').val(phone_no);
 			$('#email_address').val(email_address);

@@ -1,0 +1,209 @@
+{% extends "construction/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Edit User Roles</h4>
+</div>
+<ul class="list-group list-group-flush">
+<form  action="" id="edit-roles-submit" method="post" autocomplete="off">
+  {% csrf_token %}
+  <li class="list-group-item">
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label for="">User</label>
+          <select class="form-control form-control-sm" disabled name="select_user" id="select_user_edit">
+            <option value="{{user.id}}">{{user.username}}</option>
+          </select>
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Main Menu</label>
+          <select class="form-control form-control-sm"  name="" id="main_menu_edit">
+            <option value="">Select:</option>
+            {% for main in main_menu %}
+            <option value="{{main.ObjectID}}">{{main.ObjectTitle}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Sub Menu</label>
+          <select class="form-control form-control-sm" name="" id="sub_menu_edit">
+            <option value="">Select:</option>
+          </select>
+        </div>
+      </div>
+    </li>
+    <li class="list-group-item">
+    <div class="table table-responsive">
+      <table class="table table-bordered" id="edit_rights_table">
+          <thead>
+            <tr>
+                <th width="200px">Menu Name: </th>
+                <td id="menu_name"></td>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+      </table>
+    </div>
+    <div class="text-center">
+      <button type="submit" class="btn btn-outline-primary has_id" name="">Submit</button>
+    </div>
+  </li>
+</form>
+</ul>
+</div>
+
+<script type="text/javascript">
+
+  function getCookie(c_name)
+ {
+     if (document.cookie.length > 0)
+     {
+         c_start = document.cookie.indexOf(c_name + "=");
+         if (c_start != -1)
+         {
+             c_start = c_start + c_name.length + 1;
+             c_end = document.cookie.indexOf(";", c_start);
+             if (c_end == -1) c_end = document.cookie.length;
+             return unescape(document.cookie.substring(c_start,c_end));
+         }
+     }
+     return "";
+  }
+
+  var userID = $('#select_user_edit').find(":selected").val();
+
+  $('#main_menu_edit').on('change', function() {
+   main_object_id = this.value;
+   req =	$.ajax({
+    headers: { "X-CSRFToken": getCookie("csrftoken") },
+    type: 'POST',
+    url : `/roles/edit/${userID}`,
+    data:{
+      'main_object_id':main_object_id ,
+    },
+    dataType: 'json'
+   })
+   .done(function done(data) {
+     sub_menu = JSON.parse(data.sub_menu)
+     $('#sub_menu_edit').empty()
+     $('#sub_menu_edit').append($("<option></option>").attr("value",0).text("Select: "));
+     for (var i = 0; i < sub_menu.length; i++) {
+         $('#sub_menu_edit').append($("<option></option>").attr("value",sub_menu[i].pk).text(sub_menu[i].fields["ObjectTitle"]));
+     }
+     var menu_name = $('#sub_menu_edit').find(":selected").text();
+     $('#menu_name').html(menu_name);
+   })
+ });
+
+ $('#sub_menu_edit').on('change', function() {
+   $('#menu_name').html($(this).find(":selected").text());
+   sub_menu_id = this.value;
+   req =	$.ajax({
+    headers: { "X-CSRFToken": getCookie("csrftoken") },
+    type: 'POST',
+    url : `/roles/edit/${userID}`,
+    data:{
+      'sub_menu_id':sub_menu_id ,
+    },
+    dataType: 'json'
+   })
+   .done(function done(data) {
+     $("#edit_rights_table").find("tr:gt(0)").remove();
+     actions = data.actions;
+     var table = $('<table>').addClass('');
+     $('#edit_rights_table').append( '<tr><th>Action</th><th>Allow</th></tr>');
+     console.log(actions);
+     for(var i=0; i < actions.length; i++){
+       if (actions[i][1] == 1) {
+         var  row = '<tr>'+
+            '<td style="display:none;">'+sub_menu_id+'</td>'+
+            '<td style="display:none;">'+actions[i][2]+'</td>'+
+            '<td>'+actions[i][0]+'</td>'+
+            '<td><input type="checkbox" checked value=""></td>'+
+            '</td><td style="display:none;">'+userID+'</td>'+
+            '<td style="display:none;">'+actions[i][3]+'</td>'+
+            '</tr>'
+       } else {
+         var  row = '<tr>'+
+            '<td style="display:none;">'+sub_menu_id+'</td>'+
+            '<td style="display:none;">'+actions[i][2]+'</td>'+
+            '<td>'+actions[i][0]+'</td>'+
+            '<td><input type="checkbox" value=""></td>'+
+            '</td><td style="display:none;">'+userID+'</td>'+
+            '<td style="display:none;">'+actions[i][3]+'</td>'+
+            '</tr>'
+       }
+       $('#edit_rights_table').append(row);
+     }
+   })
+ })
+
+
+ $("#edit-roles-submit").on('submit', function(e){
+     e.preventDefault();
+     var userID = $('#select_user_edit').find(":selected").val();
+     var table = $('#edit_rights_table');
+     var data = [];
+     table.find('tr').each(function (i, el){
+     if(i != 0 && i != 1)
+     {
+       var $tds = $(this).find('td');
+       var row = {
+         'objectID' : "",
+         'actionID' : "",
+         'actionName' : "",
+         'isAllow': "",
+         'userID': "",
+         'userRightID': "",
+       };
+       $tds.each(function(i, el)
+       {
+         if (i === 0) {
+             row["objectID"] = ($(this).text());
+         }
+         else if (i === 1) {
+             row["actionID"] = ($(this).text());
+         }
+         else if (i === 2) {
+             row["actionName"] = ($(this).text());
+         }
+         else if (i === 3) {
+           if ($(this).find("input[type=checkbox]").is(':checked')) {
+               row["isAllow"] = 1;
+           }
+           else {
+             row["isAllow"] = 0;
+           }
+         }
+         else if (i === 4) {
+             row["userID"] = ($(this).text());
+         }
+         else if (i === 5) {
+             row["userRightID"] = ($(this).text());
+         }
+       });
+       data.push(row);
+     }
+   });
+     req =	$.ajax({
+      headers: { "X-CSRFToken": getCookie("csrftoken") },
+      type: 'POST',
+      url : `/roles/edit/${userID}`,
+      data:{
+        'edit_roles':JSON.stringify(data) ,
+      },
+      dataType: 'json'
+     })
+     req.done(function(){
+       alert("Updated");
+       location.reload();
+     });
+   })
+
+
+</script>
+
+{% endblock %}

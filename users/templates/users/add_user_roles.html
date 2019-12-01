@@ -1,0 +1,188 @@
+{% extends "construction/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Add User Roles</h4>
+</div>
+<ul class="list-group list-group-flush">
+<form  action="{% url 'add-user-roles' %}" id="new-roles-submit" method="post" autocomplete="off">
+  {% csrf_token %}
+  <li class="list-group-item">
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label for="">User</label>
+          <select class="form-control form-control-sm" name="select_user" id="select_user">
+            <option value="">Select:</option>
+            {% for user in users  %}
+              <option value="{{user.0}}">{{user.4}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Main Menu</label>
+          <select class="form-control form-control-sm" disabled name="" id="main_menu">
+            <option value="">Select:</option>
+            {% for main in main_menu %}
+            <option value="{{main.ObjectID}}">{{main.ObjectTitle}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Sub Menu</label>
+          <select class="form-control form-control-sm" disabled name="" id="sub_menu">
+            <option value="">Select:</option>
+          </select>
+        </div>
+      </div>
+    </li>
+    <li class="list-group-item">
+    <div class="table table-responsive">
+      <table class="table table-bordered" id="new_rights_table">
+          <thead>
+            <tr>
+                <th width="200px">Menu Name: </th>
+                <td id="menu_name"></td>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+      </table>
+    </div>
+    <div class="text-center">
+      <button type="submit" class="btn btn-outline-primary has_id" name="">Submit</button>
+    </div>
+  </li>
+</form>
+</ul>
+</div>
+
+<script type="text/javascript">
+
+  function getCookie(c_name)
+ {
+     if (document.cookie.length > 0)
+     {
+         c_start = document.cookie.indexOf(c_name + "=");
+         if (c_start != -1)
+         {
+             c_start = c_start + c_name.length + 1;
+             c_end = document.cookie.indexOf(";", c_start);
+             if (c_end == -1) c_end = document.cookie.length;
+             return unescape(document.cookie.substring(c_start,c_end));
+         }
+     }
+     return "";
+  }
+
+  var select_user;
+    $("#select_user").on('change',function() {
+      $('#main_menu').prop('disabled', false);
+      $('#sub_menu').prop('disabled', false);
+      select_user = this.value;
+    });
+
+  $('#main_menu').on('change', function() {
+
+   main_object_id = this.value;
+   req =	$.ajax({
+    headers: { "X-CSRFToken": getCookie("csrftoken") },
+    type: 'POST',
+    url : '/roles/new',
+    data:{
+      'main_object_id':main_object_id ,
+    },
+    dataType: 'json'
+   })
+   .done(function done(data) {
+     sub_menu = JSON.parse(data.sub_menu)
+     $('#sub_menu').empty()
+     $('#sub_menu').append($("<option></option>").attr("value",0).text("Select: "));
+     for (var i = 0; i < sub_menu.length; i++) {
+         $('#sub_menu').append($("<option></option>").attr("value",sub_menu[i].pk).text(sub_menu[i].fields["ObjectTitle"]));
+     }
+     var menu_name = $('#sub_menu').find(":selected").text();
+     $('#menu_name').html(menu_name);
+   })
+ });
+
+ $('#sub_menu').on('change', function() {
+   $('#menu_name').html($(this).find(":selected").text());
+   sub_menu_id = this.value;
+   req =	$.ajax({
+    headers: { "X-CSRFToken": getCookie("csrftoken") },
+    type: 'POST',
+    url : '/roles/new',
+    data:{
+      'sub_menu_id':sub_menu_id ,
+    },
+    dataType: 'json'
+   })
+   .done(function done(data) {
+     $("#new_rights_table").find("tr:gt(0)").remove();
+     actions = data.actions;
+     console.log("Here",actions)
+     var table = $('<table>').addClass('');
+     $('#new_rights_table').append( '<tr><th>Action</th><th>Allow</th></tr>');
+     for(var i=0; i < actions.length; i++){
+         $('#new_rights_table').append( '<tr><td style="display:none;">'+sub_menu_id+'</td><td style="display:none;">'+actions[i][1]+'</td><td>'+actions[i][2]+'</td><td><input type="checkbox" value=""></td></td><td style="display:none;">'+select_user+'</td></tr>');
+     }
+     $('#new_rights_table').append(table);
+   })
+ })
+
+ $("#new-roles-submit").on('submit', function(e){
+     e.preventDefault();
+     var table = $('#new_rights_table');
+     var data = [];
+     table.find('tr').each(function (i, el){
+     if(i != 0 && i != 1)
+     {
+       var $tds = $(this).find('td');
+       var row = {
+         'objectID' : "",
+         'actionID' : "",
+         'actionName' : "",
+         'isAllow': "",
+         'userID': "",
+       };
+       $tds.each(function(i, el)
+       {
+         if (i === 0) {
+             row["objectID"] = ($(this).text());
+         }
+         else if (i === 1) {
+             row["actionID"] = ($(this).text());
+         }
+         else if (i === 2) {
+             row["actionName"] = ($(this).text());
+         }
+         else if (i === 3) {
+           if ($(this).find("input[type=checkbox]").is(':checked')) {
+               row["isAllow"] = 1;
+           }
+           else {
+             row["isAllow"] = 0;
+           }
+         }
+         else if (i === 4) {
+             row["userID"] = ($(this).text());
+         }
+       });
+       data.push(row);
+     }
+   });
+     req =	$.ajax({
+      headers: { "X-CSRFToken": getCookie("csrftoken") },
+      type: 'POST',
+      url : '/roles/new',
+      data:{
+        'new_roles':JSON.stringify(data) ,
+      },
+      dataType: 'json'
+     })
+   })
+
+</script>
+{% endblock %}
