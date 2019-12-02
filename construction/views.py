@@ -606,6 +606,7 @@ def cash_payment_voucher_new(request):
     cof = ChartOfAccount.objects.all()
     cursor = conn.cursor()
     get_last_tran_id = VoucherHeader.objects.filter(voucherNo__contains='CPV').last()
+    purchases = PurchaseHeader.objects.filter(Q(payment_method='Credit')).all()
     date = datetime.date.today()
     date = date.strftime('%Y%m')
     if get_last_tran_id:
@@ -618,12 +619,21 @@ def cash_payment_voucher_new(request):
     else:
         get_last_tran_id = date[2:]+'CPV1'
 
-    if request.POST.get("samp"):
+    if request.POST.get("samp") == "projectUpdate":
         main_object_id = request.POST.get("main_object_id")
         print(main_object_id)
         sub_menu = Project.objects.filter(accountId=main_object_id).all()
         sub_menu = serializers.serialize('json',sub_menu)
         print('here', sub_menu)
+        return JsonResponse({'sub_menu':sub_menu})
+    elif request.POST.get('samp') == 'project-purchase':
+        main_object_id = request.POST.get('main_object_id')
+        sub_menu = PurchaseHeader.objects.filter(purchaseHeaderId = main_object_id)
+        sub_menu = serializers.serialize('json',sub_menu)
+        return JsonResponse({'sub_menu':sub_menu})
+    elif request.POST.get('samp') == "purchase-table":
+        sub_menu = PurchaseHeader.objects.filter(payment_method = 'Credit').all()
+        sub_menu = serializers.serialize('json',sub_menu)
         return JsonResponse({'sub_menu':sub_menu})
 
     if request.method == "POST":
@@ -655,7 +665,7 @@ def cash_payment_voucher_new(request):
             jv_detail2 = VoucherDetail(accountId = account_id, debit = 0.00, credit = -abs(float(value["Debit"])), voucherId = voucher_id, invoiceId = 0)
             jv_detail2.save()
         return JsonResponse({"Succes":"Succes"})
-    return render(request, 'construction/cash_payment_voucher_new.html',{'title':'Cash Payment Voucher Add', 'cof':cof, 'get_last_tran_id':get_last_tran_id})
+    return render(request, 'construction/cash_payment_voucher_new.html',{'title':'Cash Payment Voucher Add', 'cof':cof, 'get_last_tran_id':get_last_tran_id, 'purchases':purchases})
 
 @login_required
 def bank_payment_voucher(request):
@@ -1173,7 +1183,7 @@ def new_purchase(request):
     inv = Inventory.objects.all()
     cat = Category.objects.all()
     sup = ChartOfAccount.objects.filter(Q(parent_id=13)).all()
-    print(sup)
+    # print(sup)
     get_last_tran_id = PurchaseHeader.objects.filter(purchaseNo__contains='PUR').last()
     date = datetime.date.today()
     date = date.strftime('%Y%m')
@@ -1203,7 +1213,7 @@ def new_purchase(request):
             total = request.POST.get('grandTotal')
             stAmount = request.POST.get('stAmount')
             referenceNo = request.POST.get('referenceNo')
-            print(stAmount, project_pur)
+            # print(stAmount, project_pur)
             total = float(total)
             total = "{0:.2f}".format(total)
             # print(project_pur, total)
