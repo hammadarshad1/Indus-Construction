@@ -59,9 +59,9 @@
                   {% endfor %}
                 </select>
               </div>
-                <div class="form-group col-md-1">
+                <div class="form-group col-md-2">
                   <label for="">Amount</label>
-                  <input type="text" id="amount" class="form-control form-control-sm"/>
+                  <input type="number" id="amount" class="form-control form-control-sm"/>
                 </div>
                 <div class="form-group col-md-2">
                   <button type="button" style="margin-top:30px;" class="btn btn-info btn-sm load-invoices-bpv" id="insert-bpv-account-to-table" disabled><i class="fa fa-plus"></i>Load</button>
@@ -231,15 +231,15 @@ $("#new-bpv-table").on('click','#edit-BPV',function(){
   })
 
 
-    $("#amount").blur(function(){
-    var inp = $("#amount");
-    if (inp.val().length > 0) {
+    $("#amount").on('keyup', function(){
+  var v = this.value;
+  if(!isNaN(v) && v.length != 0){
     $("#insert-bpv-account-to-table").removeAttr('disabled');
-    }
-    else if(inp.val().length == 0) {
+  }
+  else{
     $("#insert-bpv-account-to-table").attr('disabled','disabled');
-    }
-    });
+  }
+})
 
     $("#insert-bpv-account-to-table").on('click',function(){
       $("#insert-bpv-account-to-table").attr('disabled','disabled');

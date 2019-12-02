@@ -21,9 +21,9 @@
                     <th style='display: none; font-size: 14px;' >inv id</th>
                     <th style=" font-size: 14px; width: 250px;">Item Name</th>
                     <th style=" font-size: 14px; width: 200px;">Item Category</th>
-                    <th style=" font-size: 14px; width: 150px;">Item Quantity</th>
+                    <th style=" font-size: 14px; width: 100px;">Item Quantity</th>
                     <th style=" font-size: 14px;">Project</th>
-                    <th style=" font-size: 14px;">Unit Price</th>
+                    <!-- <th style=" font-size: 14px;">Unit Price</th> -->
                     <th style=" font-size: 14px; width: 100px;">Unit</th>
                     <th width="5%" style=" font-size: 14px;">Action</th>
                 </tr>
@@ -33,11 +33,11 @@
                   <tr>
                     <td style=" font-size: 14px;">{{ forloop.counter }}</td>
                     <td style="display: none; font-size: 14px;">{{ inventory.itemId }}</td>
-                    <td style=" font-size: 14px;">{{ inventory.itemName }}</td>
+                    <td style=" font-size: 14px;width: 150px;">{{ inventory.itemName }}</td>
                     <td style=" font-size: 14px;">{{ inventory.itemCategory }}</td>
                     <td style=" font-size: 14px;">{{ inventory.itemQuantity }}</td>
-                    <td style=" font-size: 14px;">{{ inventory.projectId }}</td>
-                    <td style=" font-size: 14px;">{{ inventory.unitPrice }}</td>
+                    <td style=" font-size: 14px;width: 300px;">{{ inventory.projectId }}</td>
+                    <!-- <td style=" font-size: 14px;">{{ inventory.unitPrice }}</td> -->
                     <td style=" font-size: 14px;">{{ inventory.unit }}</td>
                     <td width="5%" style=" font-size: 14px;"><a data-toggle="modal" data-target="#updateInventoryModal" id='editInventoryButton'><button class="btn"><i class="fas fa-pencil-alt" style="color: #ffcc00"></i></button></a></td>
                   </tr>
