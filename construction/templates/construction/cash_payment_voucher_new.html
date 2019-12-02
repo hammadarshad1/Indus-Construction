@@ -37,7 +37,7 @@
 
       <div class="form-group col-md-2">
         <label for="">Description</label>
-        <textarea name="name" class="form-control form-control-sm" style="width:370px; height:30px;" id="cpv-description"></textarea>
+        <textarea name="name" readonly class="form-control form-control-sm" style="width:370px; height:30px;" id="cpv-description"></textarea>
       </div>
     </div>
     <div class="table-title">
@@ -59,7 +59,7 @@
           </div>
             <div class="form-group col-md-2">
               <label for="">Total</label>
-              <input type="number" id="amount" class="form-control form-control-sm"/>
+              <input type="number" readonly id="amount" class="form-control form-control-sm"/>
             </div>
             <div class="form-group col-md-2">
                 <label for="">Balance</label>
@@ -302,8 +302,7 @@ return "";
     .done(function done(data) {
       sub_menu = JSON.parse(data.sub_menu)
       console.log(sub_menu);
-
-
+      $("#cpv-description").text(sub_menu[0]['fields']['details'])
     })
   })
 
@@ -333,9 +332,23 @@ $("#purchase-button").on('click', function(){
 $("#dataTable").on('click','#button-table', function(){
   tr = $(this).closest('tr')
   console.log(tr);
-  // $("#CPV-modal").modal('hide');
-
+  $("#CPV-modal").modal('hide');
+  purNo = tr.find('td:eq(0)').text();
+  $("#purchase_invoice option:selected").text(purNo)
+  console.log(purNo);
 });
+
+$("#payment").on('keyup', function(){
+    var v = this.value;
+    
+    if (!isNaN(v) && v.length != 0){
+    $("#balance").val(parseFloat($("#amount").val()) - parseFloat(v));
+    }
+    else{
+      $("#balance").val($("#amount").val());
+    }
+
+  })
 </script>
 
 {% endblock %}

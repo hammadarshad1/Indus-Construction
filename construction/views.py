@@ -628,6 +628,7 @@ def cash_payment_voucher_new(request):
         return JsonResponse({'sub_menu':sub_menu})
     elif request.POST.get('samp') == 'project-purchase':
         main_object_id = request.POST.get('main_object_id')
+        print(main_object_id)
         sub_menu = PurchaseHeader.objects.filter(purchaseHeaderId = main_object_id)
         sub_menu = serializers.serialize('json',sub_menu)
         return JsonResponse({'sub_menu':sub_menu})
