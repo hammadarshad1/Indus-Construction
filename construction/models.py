@@ -72,7 +72,7 @@ class PurchaseHeader(models.Model):
     userId = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
     projectId = models.ForeignKey(Project, on_delete = models.CASCADE)
     referenceNo = models.CharField(max_length=30)
-    
+
 
     def __str__(self):
         return self.purchaseNo
@@ -129,3 +129,23 @@ class CompanyInfo(models.Model):
     mobileNo = models.CharField(max_length = 100)
     email = models.CharField(max_length = 100)
     website = models.CharField(max_length = 100)
+
+class PaymentVoucher(models.Model):
+    voucherID = models.AutoField(primary_key = True)
+    paymentVoucherNo = models.CharField(max_length = 100)
+    voucherDate = models.DateField(default = datetime.date.today)
+    purchaseInvoiceID = models.ForeignKey(PurchaseHeader, on_delete = models.CASCADE)
+    sourceID = models.ForeignKey(ChartOfAccount, on_delete = models.CASCADE, related_name="source_id")
+    projectID = models.ForeignKey(Project, on_delete = models.CASCADE)
+    clientID = models.ForeignKey(ChartOfAccount, on_delete = models.CASCADE, related_name="client_id")
+    supplierID = models.ForeignKey(ChartOfAccount, on_delete = models.CASCADE, related_name="supplier_id")
+    description = models.TextField()
+    invAmount = models.DecimalField(max_digits = 20, decimal_places = 2)
+    paidAmount = models.DecimalField(max_digits = 20, decimal_places = 2)
+    balance = models.DecimalField(max_digits = 20, decimal_places = 2)
+    userID = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
+
+
+# <a class="edit_list" href="{% url 'View-Cash-Payment-Voucher' value.voucherId %}" data-toggle=""><i class="fas fa-eye" style="color: #ffcc00;"></i></a>
+#               <a data-toggle="modal" href="{%url 'cpv' pk=value.voucherId%}"  class="has_id" id=""><i class="fa fa-print"  id="print_icon" aria-hidden="true"></i></a>
+#               

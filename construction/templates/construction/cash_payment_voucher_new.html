@@ -5,7 +5,7 @@
 <h4>Cash Payment Voucher</h4>
 </div>
 <ul class="list-group list-group-flush">
-<form  action="" id="new-cpv-form" autocomplete="off"  method="post">
+<form  action="{% url 'Cash-Payment-Vocher-New' %}" id="" autocomplete="off"  method="post">
 {% csrf_token %}
 <li class="list-group-item">
     <div class="form-row">
@@ -15,7 +15,7 @@
       </div>
       <div class="col-md-2">
         <label for="">Purchase Invoice No:</label>
-        <select class="form-control form-control-sm" id="purchase_invoice">
+        <select class="form-control form-control-sm" id="purchase_invoice" name="purchase_invoice">
           <option >Select: </option>
           {% for purchase in purchases %}
           <option value="{{purchase.purchaseHeaderId}}">{{purchase.purchaseNo}}</option>
@@ -26,14 +26,11 @@
         <br>
           <a href="#" data-toggle="modal" data-target="#CPV-modal" id='purchase-button'><button class="btn btn-info" style="height: 40px;"><i class="fas fa-search"></i></button></a>
       </div>
-      <!-- <div class="form-group col-md-2">
-        <label for="">Document No</label>
-        <input type="text" class="form-control form-control-sm" required id="cpv-doc_no">
-      </div> -->
       <div class="form-group col-md-2">
           <label for="">Supplier</label>
           <input type="text" class="form-control form-control-sm" readonly id="supplier">
-        </div>
+          <input type="hidden" class="form-control form-control-sm" readonly id="supplier_id" name="supplier_id">
+      </div>
 
       <div class="form-group col-md-2">
         <label for="">Description</label>
@@ -42,59 +39,35 @@
     </div>
     <div class="table-title">
         <div class="row">
-          <div class="col-md-2">
-            <label for="">Clients</label>
-            <select class="form-control form-control-sm" id="cpv-account_title" readonly>
-              <option value="">Select: </option>
-              {% for cof in cof %}
-              <option value="{{cof.id}}">{{cof.account_title}}</option>
-              {% endfor %}
-            </select>
+          <div class="form-group col-md-2">
+              <label for="">Client</label>
+              <input type="text" class="form-control form-control-sm" readonly id="cpv-account_title">
+              <input type="hidden" class="form-control form-control-sm" readonly id="cpv_account_title_id" name="cpv_account_title_id">
           </div>
-          <div class="col-md-2">
-            <label for="">Project</label>
-            <select class="form-control form-control-sm" id="cpv-project_id" readonly>
+          <div class="form-group col-md-2">
+              <label for="">Project</label>
+              <input type="text" class="form-control form-control-sm" readonly id="cpv-project_id">
+              <input type="hidden" class="form-control form-control-sm" readonly id="cpv-project_name_id" name="cpv-project_name_id">
+          </div>
 
-            </select>
-          </div>
             <div class="form-group col-md-2">
               <label for="">Total</label>
-              <input type="number" readonly id="amount" class="form-control form-control-sm"/>
+              <input type="number" readonly id="amount" class="form-control form-control-sm" name="amount"/>
             </div>
             <div class="form-group col-md-2">
                 <label for="">Balance</label>
-                <input type="number" id="balance" readonly class="form-control form-control-sm"/>
+                <input type="number" id="balances" readonly class="form-control form-control-sm" name="balances"/>
               </div>
               <div class="form-group col-md-2">
                   <label for="">Payment</label>
-                  <input type="number" id="payment" class="form-control form-control-sm"/>
+                  <input type="number" required id="payment" class="form-control form-control-sm" name="payment"/>
                 </div>
-            <!-- <div class="form-group col-md-2">
-              <button type="button" style="margin-top:30px;" class="btn btn-info btn-sm load-invoices" id='insert-cpv-account-to-table' disabled><i class="fa fa-plus"></i> Load</button>
-            </div> -->
         </div>
     </div>
     </li>
-  <!-- <li class="list-group-item">
-  <div class="table table-responsive">
-    <table class="table table-bordered" id="new-cpv-table">
-      <thead>
-          <tr>
-              <th width="150px">Account Id</th>
-              <th width="250px">Account Title</th>
-              <th width="250px">Debit</th>
-              <th width="250px">Credit</th>
-              <th width='50px'>Action</th>
-          </tr>
-      </thead>
-      <tbody>
-      </tbody>
-    </table>
-  </div>
-  </li> -->
     <br>
   <div class="text-center">
-    <button type="submit" class="btn btn-outline-primary">Submit <small>(CR Voucher)</small></button>
+    <button type="submit" class="btn btn-outline-primary">Submit <small>(CP Voucher)</small></button>
   </div>
   <br>
 </form>
@@ -122,6 +95,7 @@
             <tr>
               <th>Purchase Number</th>
               <th>Account</th>
+              <th>Client</th>
               <th>Project</th>
               <th>Action</th>
             </tr>
@@ -300,9 +274,15 @@ return "";
      dataType: 'json'
     })
     .done(function done(data) {
-      sub_menu = JSON.parse(data.sub_menu)
-      console.log(sub_menu);
-      $("#cpv-description").text(sub_menu[0]['fields']['details'])
+      console.log(data.sub_menu);
+      $('#supplier').val(data.sub_menu[0][0]);
+      $('#cpv-account_title').val(data.sub_menu[0][3]);
+      $('#cpv-project_id').val(data.sub_menu[0][2]);
+      $('#amount').val(data.sub_menu[0][4]);
+      $('#balances').val(data.sub_menu[0][4] - data.sub_menu[0][5]);
+      $('#cpv_account_title_id').val(data.sub_menu[0][8]);
+      $('#cpv-project_name_id').val(data.sub_menu[0][7]);
+      $('#supplier_id').val(data.sub_menu[0][6]);
     })
   })
 
@@ -340,7 +320,7 @@ $("#dataTable").on('click','#button-table', function(){
 
 $("#payment").on('keyup', function(){
     var v = this.value;
-    
+
     if (!isNaN(v) && v.length != 0){
     $("#balance").val(parseFloat($("#amount").val()) - parseFloat(v));
     }
@@ -349,6 +329,8 @@ $("#payment").on('keyup', function(){
     }
 
   })
+
+
 </script>
 
 {% endblock %}

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (
-    Category, Project, ChartOfAccount, Inventory, VoucherHeader, Transactions, VoucherDetail,CompanyInfo,PurchaseHeader,PurchaseDetail
+    Category, Project, ChartOfAccount, Inventory, VoucherHeader, Transactions, VoucherDetail,CompanyInfo,PurchaseHeader,PurchaseDetail, PaymentVoucher
 )
 
 # Register your models here.
@@ -14,3 +14,4 @@ admin.site.register(Transactions)
 admin.site.register(VoucherDetail)
 admin.site.register(PurchaseHeader)
 admin.site.register(PurchaseDetail)
+admin.site.register(PaymentVoucher)

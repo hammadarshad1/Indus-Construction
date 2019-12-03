@@ -1,0 +1,100 @@
+{% load mathfilters %}
+<html>
+<head>
+  <title>{{header.dc_no}}</title>
+<style>
+    @page {
+        size: a4 portrait;
+        @frame header_frame {           /* Static Frame */
+            -pdf-frame-content: header_content;
+            left: 30pt; width: 512pt; top: 20pt; height: 390pt;
+        }
+        @frame content_frame {          /* Content Frame */
+            left: 30pt; width: 535pt; top: 10pt; height: 780pt;
+        }
+        @frame footer_frame {           /* Another static Frame */
+            -pdf-frame-content: footer_content;
+            left: 30pt; width: 535pt; top: 755pt; height: 120pt;
+        }
+    }
+    table > thead > tr > th {
+      text-align: center;
+      font-family: "Times New Roman", Times, serif;
+        }
+        table > thead > tr > td {
+          text-align: center;
+          font-family: "Times New Roman", Times, serif;
+        }
+        .no-bottom-border{
+            border-bottom:none;
+        }
+        .heading_row{
+          border:1px solid black;
+        }
+</style>
+</head>
+<body>
+    <!-- Content for Static Frame 'header_frame' -->
+    <div id="header_content">
+      <div>
+         {% for value in company_info %}
+         <h1 style="text-align:center; font-size:400%; font-family: "Times New Roman", Times, serif; " color="#0a012c" ><b>{{value.companyName}}</b></h1>
+         {% endfor %}
+         <p style="text-align:center; padding-top:-60px ; font-family: "Times New Roman", Times, serif; " color="#0a012c"  ><font size="12px">Purchase Summary (Project Wise)</font></p>
+         <br/>
+         <p style="text-align:center; font-size:150%; padding-top:-20px ; font-family: "Times New Roman", Times, serif; " color="#0a012c">From: <b>{{from_date}}</b>    To: <b>{{to_date}}</b></p>
+     </div>
+    </div>
+<!-- Content for Static Frame 'footer_frame' -->
+<div id="footer_content">
+  <div class="footer">
+     </div>
+  page <pdf:pagenumber> of <pdf:pagecount>
+  <p style="text-align:center;">Software Developed By TechFurq, 92 322 2832789, info@techfurq.com, www.techfurq.com</p>
+</div>
+    <!-- HTML Content -->
+  <br>
+  <br>
+  <div class="body">
+     <br>
+     <br>
+     <br>
+     <header>
+       <table style="border-radius: 55px; border-bottom:1px solid black; border-spacing: 40px 10px;" cellpadding="3" bgcolor="#f7f7f7">
+       </table>
+     </header>
+     <br>
+          <br>
+               <br>
+     <font size="5"><b>Client: </b></font>&nbsp;&nbsp;&nbsp; <font size="5">{{id}} {{client}}</font> <font size="5"><b>Project Title: </b></font> &nbsp;&nbsp;&nbsp; <font size="5">{{project}}</font>
+     <br>
+     <table cellpadding="1" id="item_table" repeat="1">
+        <thead>
+          <tr class="heading_row">
+            <th align="center"><font size="12px">Date</font></th>
+            <th style="width:30px;"><font size="12px">Invoice No</font></th>
+            <th style="width:50px;"><font size="12px">Vendor</font></th>
+            <th style="width:700px;"><font size="12px">Particular</font></th>
+            <th style="width:200px;text-align: right;"><font size="12px">Total Amount</font></th>
+            <th style="width:200px;text-align: right;"><font size="12px">Paid Amount</font></th>
+            <th style="width:200px;text-align: right;"><font size="12px">Balance</font></th>
+          </tr>
+        </thead>
+        <tbody>
+      {% for value in purchase_list %}
+        <tr class="">
+          <td style="width: 150px; height:30px;"><font size="12px">{{value.date}}</font></td>
+          <td style="width: 300px;"><font size="12px">{{value.invoice_no}}</font></td>
+          <td style="width: 300px;"><font size="12px">{{value.account_title}}</font></td>
+          <td style="width: 600px; text-align:center;"><font size="12px">{{details}}</font></td>
+          <td style="width: 150px; text-align:right;"><font size="12px">{{value.total_amount|floatformat:2}}</font></td>
+          <td style="width: 150px; text-align:right;"><font size="12px">{{value.paid_amount|floatformat:2}}</font></td>
+          <td style="width: 150px; text-align:right;"><font size="12px">{{value.balance|floatformat:2}}</font></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+      </table>
+  <br>
+</div>
+</body>
+</html>

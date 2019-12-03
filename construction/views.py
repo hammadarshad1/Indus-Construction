@@ -14,7 +14,7 @@ import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import (
     Category, Project, ChartOfAccount, Inventory, VoucherHeader, Transactions, VoucherDetail,
-    CompanyInfo, PurchaseHeader, PurchaseDetail
+    CompanyInfo, PurchaseHeader, PurchaseDetail, PaymentVoucher
 )
 from django.contrib.auth.decorators import login_required
 from decimal import Decimal
@@ -288,7 +288,7 @@ def delete_chart_of_account(request,pk):
     else:
         ChartOfAccount.objects.filter(id = pk).all().delete()
         return redirect('chart-of-account')
-        
+
     return redirect('chart-of-account')
 
 def view_purchase_voucher(request, pk):
@@ -343,7 +343,7 @@ def project(request):
             sub_menu = Project.objects.filter(accountId=main_object_id).all()
             sub_menu = serializers.serialize('json',sub_menu)
             return JsonResponse({'sub_menu':sub_menu})
-            
+
         else:
             ProjectId = request.POST.get('projectIdUpdate')
             customerUpdate = request.POST.get('customer-id')
@@ -373,7 +373,7 @@ def delete_project(request, pk):
 
     else:
         project = Project.objects.filter(projectId=pk).delete()
-    
+
         print("deleted")
         return redirect('Project')
 
@@ -598,19 +598,19 @@ def bank_receiving_voucher_new(request):
 
 @login_required
 def cash_payment_voucher(request):
-    all_voucher = VoucherHeader.objects.filter(voucherNo__contains="CPV").all()
-    return render(request, 'construction/cash_payment_voucher.html',{'title':'Cash Payment Voucher','all_voucher':all_voucher})
+    all_voucher = PaymentVoucher.objects.all()
+    return render(request, 'construction/cash_payment_voucher.html',{'all_voucher':all_voucher})
 
 @login_required
 def cash_payment_voucher_new(request):
     cof = ChartOfAccount.objects.all()
     cursor = conn.cursor()
-    get_last_tran_id = VoucherHeader.objects.filter(voucherNo__contains='CPV').last()
+    get_last_tran_id = PaymentVoucher.objects.last()
     purchases = PurchaseHeader.objects.filter(Q(payment_method='Credit')).all()
     date = datetime.date.today()
     date = date.strftime('%Y%m')
     if get_last_tran_id:
-        get_last_tran_id = get_last_tran_id.voucherNo
+        get_last_tran_id = get_last_tran_id.paymentVoucherNo
         get_last_tran_id = get_last_tran_id[7:]
         get_last_tran_id = int(get_last_tran_id)
         get_last_tran_id = get_last_tran_id+1
@@ -621,16 +621,21 @@ def cash_payment_voucher_new(request):
 
     if request.POST.get("samp") == "projectUpdate":
         main_object_id = request.POST.get("main_object_id")
-        print(main_object_id)
         sub_menu = Project.objects.filter(accountId=main_object_id).all()
         sub_menu = serializers.serialize('json',sub_menu)
-        print('here', sub_menu)
         return JsonResponse({'sub_menu':sub_menu})
     elif request.POST.get('samp') == 'project-purchase':
         main_object_id = request.POST.get('main_object_id')
-        print(main_object_id)
-        sub_menu = PurchaseHeader.objects.filter(purchaseHeaderId = main_object_id)
-        sub_menu = serializers.serialize('json',sub_menu)
+        cursor.execute('''select COA.account_title, PH.details, CP.projectName ,COAS.account_title, PD.total,sum(PV.paidAmount),PH.accountId_id, PH.projectId_id, COAS.id
+                        from construction_purchaseheader PH
+                        inner join construction_chartofaccount COA on COA.id = PH.accountId_id
+                        inner join construction_project CP on PH.projectId_id = CP.projectId
+                        inner join construction_chartofaccount COAS on COAS.id = CP.accountId_id
+                        inner join construction_purchasedetail PD on PD.purchaseHeaderId_id = PH.purchaseHeaderId
+                        left join construction_paymentvoucher PV on PV.purchaseInvoiceID_id = PH.purchaseHeaderId
+                        where PH.purchaseHeaderId = %s
+                        group by COA.account_title, PH.details, CP.projectName, COAS.account_title,PD.total;''',[main_object_id])
+        sub_menu = cursor.fetchall()
         return JsonResponse({'sub_menu':sub_menu})
     elif request.POST.get('samp') == "purchase-table":
         sub_menu = PurchaseHeader.objects.filter(payment_method = 'Credit').all()
@@ -638,35 +643,35 @@ def cash_payment_voucher_new(request):
         return JsonResponse({'sub_menu':sub_menu})
 
     if request.method == "POST":
-        doc_no = request.POST.get('documentNo', False)
-        tran_id = request.POST.get('transactionId', False)
-        doc_date = request.POST.get('doc-date', False)
-        desc = request.POST.get('description', False)
-        project_id = request.POST.get('project', False)
-        account_id = request.POST.get('account_id', False)
-        data = json.loads(request.POST.get('items', False))
-        date = request.POST.get('date', False)
-        account_id = ChartOfAccount.objects.get(id = account_id)
-        project_id = Project.objects.get(projectId = project_id)
-        voucher_header = VoucherHeader(voucherNo = tran_id, date = date, docNo = doc_no, docDate = doc_date, chequeNo = "", chequeDate = date, description = desc, userId = request.user, projectId = project_id, accountId = account_id)
+        purchase_invoice = request.POST.get('purchase_invoice')
+        supplier_id = request.POST.get('supplier_id')
+        cpv_account_title_id = request.POST.get('cpv_account_title_id')
+        cpv_project_name_id = request.POST.get('cpv-project_name_id')
+        inv_amount = request.POST.get('amount')
+        balances = request.POST.get('balances')
+        payment = request.POST.get('payment')
+        supplier_id = ChartOfAccount.objects.get(id = supplier_id)
+        cpv_account_title_id = ChartOfAccount.objects.get(id = cpv_account_title_id)
+        print("here", cpv_project_name_id)
+        cpv_project_name_id = Project.objects.get(projectId = cpv_project_name_id)
+        purchase_invoice = PurchaseHeader.objects.get(purchaseHeaderId = purchase_invoice)
+        sourceID = ChartOfAccount.objects.get(id = 4)
+        date = datetime.date.today()
+        voucher_header = PaymentVoucher(paymentVoucherNo = get_last_tran_id, voucherDate = date, purchaseInvoiceID = purchase_invoice, sourceID = sourceID, projectID = cpv_project_name_id, clientID = cpv_account_title_id, supplierID = supplier_id, description = "", invAmount = inv_amount, paidAmount = payment, balance = balances, userID = request.user)
         voucher_header.save()
-        voucher_id = VoucherHeader.objects.get(voucherNo = tran_id)
-        for value in data:
-            account_id = ChartOfAccount.objects.get(id = value["AccountId"])
-            tran1 = Transactions(refrenceId = 0, refrenceDate = doc_date, tranType = '', amount = abs(float(value["Debit"])),
-                    date = date, remarks = desc, accountId = account_id, refInvTranId = doc_no, refInvTranType = 'CPV', voucherId = voucher_id.voucherId, userId = request.user, project_id=0)
-            tran1.save()
-            jv_detail1 = VoucherDetail(accountId = account_id, debit = abs(float(value["Debit"])), credit = 0.00, voucherId = voucher_id, invoiceId = 0)
-            jv_detail1.save()
-
-            account_id = ChartOfAccount.objects.get(id = 4)
-            tran2 = Transactions(refrenceId = 0, refrenceDate = doc_date, tranType = '', amount = -abs(float(value["Debit"])),
-                    date = date, remarks = desc, accountId = account_id, refInvTranId = doc_no, refInvTranType = 'CPV', voucherId = voucher_id.voucherId, userId = request.user, project_id=0)
-            tran2.save()
-            jv_detail2 = VoucherDetail(accountId = account_id, debit = 0.00, credit = -abs(float(value["Debit"])), voucherId = voucher_id, invoiceId = 0)
-            jv_detail2.save()
-        return JsonResponse({"Succes":"Succes"})
-    return render(request, 'construction/cash_payment_voucher_new.html',{'title':'Cash Payment Voucher Add', 'cof':cof, 'get_last_tran_id':get_last_tran_id, 'purchases':purchases})
+        tran1 = Transactions(refrenceId = 0, refrenceDate = date, tranType = '', amount = abs(float(inv_amount)),
+                date = date, remarks = "", accountId = supplier_id, refInvTranId = purchase_invoice.purchaseHeaderId, refInvTranType = 'CPV', voucherId = get_last_tran_id, userId = request.user, project_id=0)
+        tran1.save()
+        account_id = ChartOfAccount.objects.get(id = 4)
+        tran2 = Transactions(refrenceId = 0, refrenceDate = date, tranType = '', amount = -abs(float(inv_amount)),
+                date = date, remarks = "", accountId = sourceID, refInvTranId = purchase_invoice.purchaseHeaderId, refInvTranType = 'CPV', voucherId = get_last_tran_id, userId = request.user, project_id=0)
+        tran2.save()
+        # return redirect('Cash-Payment-Vocher-New')
+    context = {
+        "get_last_tran_id":get_last_tran_id,
+        "purchases":purchases
+    }
+    return render(request, 'construction/cash_payment_voucher_new.html', context)
 
 @login_required
 def bank_payment_voucher(request):
@@ -966,8 +971,9 @@ def delete_bank_receiving_voucher(request, pk):
 
 @login_required
 def delete_cash_payment_voucher(request, pk):
-    vc = VoucherHeader.objects.filter(voucherId=pk).delete()
-    tran = Transactions.objects.filter(voucherId=pk).all().delete()
+    vc = PaymentVoucher.objects.get(voucherID = pk)
+    tran = Transactions.objects.filter(voucherId=vc.paymentVoucherNo).all().delete()
+    vc = PaymentVoucher.objects.filter(voucherID=pk).delete()
     print("deleted")
     return redirect('Cash-Payment-Vocher')
 
@@ -1071,6 +1077,7 @@ def sale_summary_item_wise(request):
         return HttpResponse("Not found")
     return redirect('report')
 
+
 @login_required
 def account_ledger(request):
      if request.method == "POST":
@@ -1081,7 +1088,6 @@ def account_ledger(request):
          to_date = request.POST.get('to_date')
          projects = request.POST.get('projects')
          company_info = CompanyInfo.objects.filter(id=1).all()
-         print("Comna", company_info)
          cursor = connection.cursor()
          print(pk,from_date,to_date,pk,projects)
          cursor.execute('''select '' as refrenceid,'' as trantype,'' as date,'' as refinvtranid,
@@ -1219,7 +1225,7 @@ def new_purchase(request):
             total = "{0:.2f}".format(total)
             # print(project_pur, total)
 
-            cof = ChartOfAccount.objects.filter(id=17) 
+            cof = ChartOfAccount.objects.filter(id=17)
             p = PurchaseHeader(purchaseNo=get_last_tran_id,referenceNo=referenceNo, payment_method=PayMethod, details=Description, tax=float(stAmount), accountId= ChartOfAccount.objects.get(account_title=supplier), userId=request.user, projectId=Project.objects.get(projectId=project_pur))
             p.save()
             items = json.loads(request.POST.get('items'))
@@ -1233,21 +1239,21 @@ def new_purchase(request):
                 print(itemCategory)
                 item_add = Inventory(itemName = itemName, itemCategory=Category.objects.get(categoryName=itemCategory), itemQuantity= itemQuantity, unitPrice=0.0,unit=unit, projectId=Project.objects.get(projectId=project_pur), userId=request.user)
                 item_add.save()
-                
+
                 pur_detail = PurchaseDetail(purchaseQuantity=itemQuantity, purchasePrice=Price, total=total, itemId=Inventory.objects.last(), purchaseHeaderId=PurchaseHeader.objects.last())
                 pur_detail.save()
-                
+
             pur = PurchaseHeader.objects.get(purchaseNo=get_last_tran_id)
             pur_id = pur.purchaseHeaderId
-            GrandTotal = request.POST.get("grandTotal")    
+            GrandTotal = request.POST.get("grandTotal")
             if PayMethod == "Cash":
                 t1 = Transactions(refrenceId=0, refrenceDate=Date, accountId=ChartOfAccount.objects.get(id=4), tranType="Purchase Invoice", amount=-abs(float(GrandTotal)),refInvTranId=pur_id, refInvTranType='', remarks=get_last_tran_id, userId=request.user, project_id=project_pur, voucherId='')
-                t2 = Transactions(refrenceId=0, refrenceDate=Date, accountId=ChartOfAccount.objects.get(account_title=supplier), tranType="Purchase Invoice", amount=abs(float(GrandTotal)),refInvTranId=pur_id, refInvTranType='', remarks=get_last_tran_id, userId=request.user, project_id=project_pur, voucherId='')   
+                t2 = Transactions(refrenceId=0, refrenceDate=Date, accountId=ChartOfAccount.objects.get(account_title=supplier), tranType="Purchase Invoice", amount=abs(float(GrandTotal)),refInvTranId=pur_id, refInvTranType='', remarks=get_last_tran_id, userId=request.user, project_id=project_pur, voucherId='')
                 t1.save()
                 t2.save()
             elif PayMethod == "Credit":
                 t1 = Transactions(refrenceId=0, refrenceDate=Date, accountId=ChartOfAccount.objects.get(id=8), tranType="Purchase Invoice", amount=abs(float(GrandTotal)),refInvTranId=pur_id, refInvTranType='', remarks=get_last_tran_id, userId=request.user, project_id=project_pur, voucherId='')
-                t2 = Transactions(refrenceId=0, refrenceDate=Date, accountId=ChartOfAccount.objects.get(account_title=supplier), tranType="Purchase Invoice", amount=-abs(float(GrandTotal)),refInvTranId=pur_id, refInvTranType='', remarks=get_last_tran_id, userId=request.user, project_id=project_pur, voucherId='')   
+                t2 = Transactions(refrenceId=0, refrenceDate=Date, accountId=ChartOfAccount.objects.get(account_title=supplier), tranType="Purchase Invoice", amount=-abs(float(GrandTotal)),refInvTranId=pur_id, refInvTranType='', remarks=get_last_tran_id, userId=request.user, project_id=project_pur, voucherId='')
                 # t1.save()
                 # t2.save()
             return JsonResponse({'success':'success'})
@@ -1256,5 +1262,110 @@ def new_purchase(request):
             print(main_object_id)
             sub_menu = Project.objects.filter(accountId=ChartOfAccount.objects.get(account_title=main_object_id)).all()
             sub_menu = serializers.serialize('json',sub_menu)
-            return JsonResponse({'sub_menu':sub_menu}) 
+            return JsonResponse({'sub_menu':sub_menu})
     return render(request, 'construction/new_purchase.html',{'title':'New Purchase', 'all_accounts': all_accounts, 'get_last_tran_id':get_last_tran_id, 'inv':inv, 'category':cat, 'project':project, 'all_supplier':sup})
+
+@login_required
+def purchase_summary(request):
+     if request.method == "POST":
+         from_date = request.POST.get('from_date')
+         to_date = request.POST.get('to_date')
+         project_id = request.POST.get('projects')
+         project_title = Project.objects.get(projectId = project_id)
+         client = ChartOfAccount.objects.filter(id = project_title.accountId.id).first()
+         company_info = CompanyInfo.objects.all()
+         cursor = connection.cursor()
+         cursor.execute('''select PH.purchaseNo,PH.purchaseDate, PH.referenceNo , COA.account_title ,PH.details, CP.projectName ,PH.payment_method, PD.total, sum(PV.paidAmount),PH.purchaseHeaderId
+                        from construction_purchaseheader PH
+                        inner join construction_paymentvoucher PV on PV.purchaseInvoiceID_id = PH.purchaseHeaderId
+                        inner join construction_purchasedetail PD on PD.purchaseHeaderId_id = PH.purchaseHeaderId
+                        inner join construction_chartofaccount COA on COA.id = PH.accountId_id
+                        inner join construction_project CP on CP.projectId = PH.projectId_id
+                        where PH.projectId_id = %s AND PH.purchaseDate Between %s AND %s
+                        Group by PH.purchaseNo, PH.purchaseDate, PH.referenceNo, COA.account_title,PH.details,CP.projectName,PH.payment_method,PD.total,purchaseHeaderId
+                        order by PH.purchaseHeaderId; ''',[project_id ,from_date, to_date])
+         row = cursor.fetchall()
+         purchase_list = []
+         for i,value in enumerate(row):
+             balance = value[7] - value[8]
+             info = {
+             "invoice_no": value[0],
+             "date": value[1],
+             "refrence_no": value[2],
+             "account_title": value[3],
+             "details": value[4],
+             "total_amount":value[7],
+             "paid_amount": value[8],
+             "balance": balance,
+             }
+             purchase_list.append(info)
+         context = {
+         "purchase_list" : purchase_list,
+         "company_info": company_info,
+         "from_date":from_date,
+         "to_date":to_date,
+          "client": client.account_title,
+          "project": project_title.projectName,
+         }
+         pdf = render_to_pdf('construction/purchase_summary.html', context)
+         if pdf:
+             response = HttpResponse(pdf, content_type='application/pdf')
+             filename = "PurchaseSummary%s.pdf" %("000")
+             content = "inline; filename='%s'" %(filename)
+             response['Content-Disposition'] = content
+             return response
+         return HttpResponse("Not found")
+     return redirect('Report')
+
+@login_required
+def purchase_summary_detail(request):
+    if request.method == "POST":
+        from_date = request.POST.get('from_date')
+        to_date = request.POST.get('to_date')
+        project_id = request.POST.get('projects')
+        company_info = CompanyInfo.objects.all()
+        cursor = connection.cursor()
+        cursor.execute('''select PH.purchaseHeaderId, COA.account_title, CP.projectName, COAS.account_title as 'Supplier',
+                        PH.purchaseNo, PH.purchaseDate, PD.total as 'Total Amount', sum(PV.paidAmount) as 'Paid Amount'
+                        from construction_purchaseheader PH
+                        inner join construction_project CP on PH.projectId_id = CP.projectId
+                        inner join construction_chartofaccount COA on COA.id = CP.accountId_id
+                        inner join construction_chartofaccount COAS on COAS.id = PH.accountId_id
+                        inner join construction_purchasedetail PD on PD.purchaseHeaderId_id = PH.purchaseHeaderId
+                        inner join construction_paymentvoucher PV on PV.purchaseInvoiceID_id = PH.purchaseHeaderId
+                        where PH.projectId_id = %s AND PH.purchaseDate Between %s AND %s
+                        group by PH.purchaseHeaderId, PD.total;''',[project_id ,from_date, to_date])
+        row = cursor.fetchall()
+        purchase_detail = PurchaseDetail.objects.all()
+        purchase_detail_list = []
+        for i,value in enumerate(row):
+            balance = value[6] - value[7]
+            info = {
+            "invoice_no": value[0],
+            "client_name": value[1],
+            "project_name": value[2],
+            "supplier_name": value[3],
+            "purchase_ no":value[4],
+            "purchase_date": value[5],
+            "total_amount": value[6],
+            "paid_amount": value[7],
+            "balance_amount": balance,
+            }
+            purchase_detail_list.append(info)
+
+        context = {
+          "purchase_detail_list": purchase_detail_list,
+          "purchase_detail":purchase_detail,
+          "company_info": company_info,
+          "from_date":from_date,
+          "to_date":to_date,
+        }
+        pdf = render_to_pdf('construction/purchase_summary_detail.html', context)
+        if pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            filename = "PurchaseSummary%s.pdf" %("000")
+            content = "inline; filename='%s'" %(filename)
+            response['Content-Disposition'] = content
+            return response
+        return HttpResponse("Not found")
+        return redirect('Report')
