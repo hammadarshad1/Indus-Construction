@@ -29,7 +29,10 @@ def flush_transaction():
 
 @login_required
 def home(request):
-    return render(request,'construction/home.html',{'title':'Home'})
+    cursor = connection.cursor()
+    cursor.execute('''select count(projectId)-1 from construction_project''')
+    projects = cursor.fetchall()
+    return render(request,'construction/home.html',{'title':'Home', 'projects':projects})
 
 # @login_required(login_url='Login')
 # def addInventory(request):
@@ -479,7 +482,6 @@ def cash_receiving_voucher(request):
 def cash_receiving_voucher_new(request):
     cof = ChartOfAccount.objects.all()
     projects = Project
-    cursor = conn.cursor()
     get_last_tran_id = VoucherHeader.objects.filter(voucherNo__contains='CRV').last()
     date = datetime.date.today()
     date = date.strftime('%Y%m')
@@ -492,6 +494,7 @@ def cash_receiving_voucher_new(request):
         get_last_tran_id = date[2:] + 'CRV' + get_last_tran_id
     else:
         get_last_tran_id = date[2:]+'CRV1'
+    
 
     if request.POST.get("samp") == "projectUpdate":
         main_object_id = request.POST.get("main_object_id")
@@ -574,6 +577,7 @@ def bank_receiving_voucher_new(request):
         data = json.loads(request.POST.get('items', False))
         date = request.POST.get('date', False)
         bank_account = request.POST.get('bank_account', False)
+        project_id = request.POST.get('project_id', False)
         account_id = ChartOfAccount.objects.get(id = account_id)
         bank_account = ChartOfAccount.objects.get(id = bank_account)
         project_id = Project.objects.get(projectId = project_id)
@@ -680,7 +684,7 @@ def bank_payment_voucher(request):
 
 @login_required
 def bank_payment_voucher_new(request):
-    all_bank_accounts = ChartOfAccount.objects.filter(account_id = 100).all()
+    all_bank_accounts = ChartOfAccount.objects.filter(parent_id = 26).all()
     get_last_tran_id = VoucherHeader.objects.filter(voucherNo__contains='BPV').last()
     cof = ChartOfAccount.objects.all()
     cursor = conn.cursor()
@@ -826,8 +830,8 @@ def brv_pdf(request, pk):
 def bpv_pdf(request, pk):
     company_info = CompanyInfo.objects.all()
     header = VoucherHeader.objects.filter(voucherId = pk).first()
-    details = VoucherDetail.objects.filter(debit = 0,voucherId = header.voucherId).first()
-    # bank = ChartOfAccount.objects.filter(account_id = '200')
+    details = VoucherDetail.objects.filter(credit = 0,voucherId = header.voucherId).first()
+    bank = VoucherDetail.objects.get(debit = 0, voucherId= header.voucherId)
     print("Here is ",details)
     cursor = connection.cursor()
     detail = cursor.execute('''select sum(VD.credit) as Amount,COA.account_title, COA.id
@@ -839,7 +843,7 @@ def bpv_pdf(request, pk):
                             ''',[header.voucherId,details.accountId.id])
     detail = cursor.fetchall()
     amount_in_words =  num2words(abs(detail[0][0]))
-    pdf = render_to_pdf('construction/brv_pdf.html', {'company_info':company_info, 'header':header, 'detail':detail, 'amount_in_words':amount_in_words})
+    pdf = render_to_pdf('construction/bpv_pdf.html', {'company_info':company_info, 'header':header, 'detail':detail, 'amount_in_words':amount_in_words, 'bank':bank})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "BankPaymentVoucher.pdf"
