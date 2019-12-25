@@ -1,4 +1,105 @@
 {% extends 'construction/base.html' %}
 {% block content %}
-  
+<style>
+    .column {
+  float: left;
+  width: 49%;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+</style>
+<h4>Projects</h4>
+<div class="table table-responsive">
+<table class="table table-bordered sort" id='dataTable'>
+    <thead>
+      <tr>
+        <th style="width: 5%; font-size: 14px;">S NO.</th>
+        <th style='display: none;'>proj id</th>
+        <th style="width:10px;">Project Code</th>
+        <th width='250px' style=" font-size: 14px;">Client</th>
+        <th width='350px' style=" font-size: 14px;">Project Name</th>
+        <th style="font-size: 14px;width: 100px">Status</th>
+        <!-- <th width="110px" style=" font-size: 14px;">Action</th> -->
+      </tr>
+    </thead>
+    <tbody>
+        {% for project in projects %}
+          <tr>
+            <td style=" font-size: 14px;">{{ forloop.counter }}</td>
+            <td style="display: none;" id=inventoryId>{{ project.projectId }}</td>
+            <td style="width:120px;">{{ project.projectCode }}</td>
+            <td style=" font-size: 14px;">{{ project.accountId }}</td>
+            <td value='{{ project.accountId.accountId }}' style=" font-size: 14px;">{{ project.projectName }}</td>
+            <td style="font-size: 14px;">{{ project.projectStatus }}</td>
+            <!-- <td style=" font-size: 14px;"><a data-toggle="modal" data-target="#updateProjectModal"
+                id='editProjectButton'><button class="btn"><i class="fas fa-pencil-alt"
+                    style="color: #ffcc00"></i></button></a><a class="delete-project" href='#' data-toggle="modal"
+                data-target="#deleteCoaModal" id="{{project.projectId}}"><button class="btn" id='inventoryDeleteButton'><i
+                    class="fa fa-trash" style="color:#ff1a1a;"></i></button></a></td> -->
+          </tr>
+        {% endfor %}
+    </tbody>
+
+  </table>
+  </div>
+  <hr>
+  <div class="row">
+    <div class="column">
+        <h4>Clients</h4>
+<div class="table table-responsive">
+<table class="table table-bordered sort" id='dataTable'>
+    <thead>
+      <tr>
+        <th style="width: 10%; font-size: 14px;">S NO.</th>
+        <th style="width: 100%; font-size: 14px;">Client</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for client in clients %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ client.account_title }}</td>
+          </tr>
+        {% endfor %}
+    </tbody>
+
+  </table>
+  </div>
+    </div>
+    <style>
+        .vl {
+          border-left: 6px solid white;
+          height: 500px;
+        }
+        </style>
+        
+        <div class="vl"></div> 
+    <div class="column">
+        <h4>Bank Accounts</h4>
+        <div class="table table-responsive">
+            <table class="table table-bordered sort" id='dataTable'>
+                <thead>
+                  <tr>
+                    <th style="width: 10%; font-size: 14px;">S NO.</th>
+                    <th style="width: 100%; font-size: 14px;">Client</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for bank in banks %}
+                      <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ bank.account_title }}</td>
+                      </tr>
+                    {% endfor %}
+                </tbody>
+            
+              </table>
+              </div>
+    </div>
+  </div> 
 {% endblock %}

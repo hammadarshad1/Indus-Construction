@@ -29,10 +29,10 @@ def flush_transaction():
 
 @login_required
 def home(request):
-    cursor = connection.cursor()
-    cursor.execute('''select count(projectId)-1 from construction_project''')
-    projects = cursor.fetchall()
-    return render(request,'construction/home.html',{'title':'Home', 'projects':projects})
+    projects = Project.objects.filter(~Q(projectName = 'General')).all()
+    clients = ChartOfAccount.objects.filter(~Q(parent_id=11) & ~Q(parent_id=26))
+    banks = ChartOfAccount.objects.filter(Q(parent_id=26)).all()
+    return render(request,'construction/home.html',{'title':'Home', 'projects':projects, 'clients':clients, 'banks':banks})
 
 # @login_required(login_url='Login')
 # def addInventory(request):
